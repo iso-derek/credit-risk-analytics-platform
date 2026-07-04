@@ -6,12 +6,17 @@ All notable changes to this project will be documented in this file.
 
 ### Planned
 
-- Add configurable public credit dataset support.
 - Add advanced risk analytics and banking metrics.
 - Add explainable AI views.
 - Upgrade Streamlit dashboard navigation and reporting.
 - Add model benchmarking.
 - Add tests, CI, Docker and deployment documentation.
+
+### Added
+
+- Added configurable external public credit dataset path support.
+- Added data quality validation for required columns, duplicates and missing values.
+- Added synthetic fallback data handling when external data is unavailable.
 
 ## [1.0.0] - 2026-06-26
 

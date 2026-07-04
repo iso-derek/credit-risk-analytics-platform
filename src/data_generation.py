@@ -7,10 +7,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from config import DEFAULT_SYNTHETIC_PATH, RAW_DIR, configured_credit_data_path
+from data_quality import prepare_credit_dataset, validate_credit_dataset
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-RAW_DIR = PROJECT_ROOT / "data" / "raw"
-RAW_PATH = RAW_DIR / "synthetic_loan_applications.csv"
+RAW_PATH = DEFAULT_SYNTHETIC_PATH
 
 
 def generate_credit_data(n_rows: int = 15000, seed: int = 42) -> pd.DataFrame:
@@ -78,10 +78,40 @@ def save_credit_data(path: Path = RAW_PATH) -> pd.DataFrame:
     return df
 
 
-def load_or_create_credit_data(path: Path = RAW_PATH) -> pd.DataFrame:
+def load_public_credit_data(path: Path | None = None) -> tuple[pd.DataFrame | None, list[str]]:
+    """Load a configured public credit dataset if it exists and matches the schema."""
+
+    dataset_path = path or configured_credit_data_path()
+    if not dataset_path.exists():
+        return None, [f"External credit dataset not found: {dataset_path}"]
+
+    df = pd.read_csv(dataset_path)
+    warnings = validate_credit_dataset(df)
+    if any(warning.startswith("Missing required columns") for warning in warnings):
+        return None, warnings
+    return prepare_credit_dataset(df), warnings
+
+
+def load_or_create_credit_data(path: Path = RAW_PATH, external_path: Path | None = None) -> pd.DataFrame:
+    """Load external public data when available, otherwise use synthetic fallback data."""
+
+    external_df, _warnings = load_public_credit_data(external_path)
+    if external_df is not None:
+        return external_df
     if path.exists():
-        return pd.read_csv(path)
+        return prepare_credit_dataset(pd.read_csv(path))
     return save_credit_data(path)
+
+
+def data_source_status(external_path: Path | None = None) -> dict[str, object]:
+    """Return metadata describing which dataset source is active."""
+
+    configured_path = external_path or configured_credit_data_path()
+    external_df, warnings = load_public_credit_data(configured_path)
+    if external_df is not None:
+        return {"source": str(configured_path), "rows": len(external_df), "warnings": warnings, "fallback": False}
+    fallback = load_or_create_credit_data()
+    return {"source": str(RAW_PATH), "rows": len(fallback), "warnings": warnings, "fallback": True}
 
 
 if __name__ == "__main__":

@@ -85,6 +85,28 @@ Version 1.0 uses a realistic synthetic loan application dataset generated locall
 
 Phase 2 adds configurable support for public credit datasets while keeping synthetic data as a fallback for reproducibility.
 
+### External Dataset Configuration
+
+Place a public credit dataset with the expected schema at:
+
+```text
+data/raw/public_credit_dataset.csv
+```
+
+Or set a custom path:
+
+```bash
+set CREDIT_DATA_PATH=C:\path\to\public_credit_dataset.csv
+```
+
+On macOS or Linux:
+
+```bash
+export CREDIT_DATA_PATH=/path/to/public_credit_dataset.csv
+```
+
+If the external dataset is missing or does not include the required fields, the project falls back to synthetic demo data.
+
 ## Risk Modelling Methodology
 
 The baseline modelling workflow trains multiple classification models using engineered borrower and loan features. The best model is selected by ROC-AUC and used to produce PD estimates. PD values are translated into credit risk bands and expected loss is calculated using a configurable LGD assumption.
