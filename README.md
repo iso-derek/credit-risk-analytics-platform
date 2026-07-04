@@ -1,58 +1,64 @@
 # Credit Risk Analytics Platform
 
-## Overview
+An enterprise-style Python credit risk analytics platform for probability of default modelling, portfolio risk monitoring, expected loss analysis and business-friendly applicant explanations.
 
-Credit Risk Analytics Platform is a Python data science project for loan default prediction, probability of default modelling, credit score banding, and expected loss analysis. It uses a realistic synthetic loan dataset and includes a Streamlit dashboard for portfolio and applicant-level risk review.
+This project is designed as a finance, risk analytics and data science portfolio project. It demonstrates how a lending analytics workflow can move from raw application data to feature engineering, model training, PD scoring, risk banding, expected loss analysis and dashboard reporting.
 
-The project is suitable for MSc Finance & Data Science / Financial Engineering applications, graduate risk analytics roles, fintech roles, consulting analytics roles, and data science portfolios.
-
-This project is for educational and analytical purposes only. It is not a production lending decision engine.
+> Educational use only. This project is not a production lending decision engine and should not be used to approve or reject real credit applications.
 
 ## Business Problem
 
-Lenders and fintech teams need to evaluate applicant risk, estimate probability of default, monitor portfolio exposure, and explain the main drivers of credit risk. This project demonstrates how a credit analytics workflow can move from raw applications to model scoring, risk bands, expected loss, and dashboard reporting.
+Banks, fintech lenders and credit teams need to evaluate borrower risk consistently while keeping model outputs explainable to risk, operations and business stakeholders. A useful credit risk system needs to answer:
 
-## Key Features
+- Which applicants are most likely to default?
+- Which segments concentrate expected loss?
+- Which credit drivers explain elevated risk?
+- How well does the model separate good and bad applicants?
+- How should portfolio risk be monitored over time?
 
-- Synthetic loan application dataset
-- Missing value and categorical preprocessing
-- Feature engineering for credit risk
-- Logistic Regression model
-- Random Forest model
-- Optional XGBoost model if installed
-- Probability of Default scoring
-- Credit score bands
-- Expected loss calculation using PD, LGD, and EAD
-- ROC-AUC, precision, recall, and confusion matrix
-- Feature importance explanation
-- Streamlit dashboard for applicant and portfolio risk
+This platform addresses those questions with a complete analytical workflow for credit application scoring and portfolio review.
 
-## Technologies Used
+## Financial Context
 
-- Python
-- pandas
-- NumPy
-- scikit-learn
-- Streamlit
-- Plotly
-- Optional XGBoost
+The project uses common retail credit risk concepts:
 
-## Project Structure
+- **Probability of Default (PD):** estimated likelihood that an applicant defaults.
+- **Loss Given Default (LGD):** share of exposure lost if default occurs.
+- **Exposure at Default (EAD):** expected outstanding balance at default.
+- **Expected Loss (EL):** `PD x LGD x EAD`.
+- **Risk Grades:** business-friendly bands derived from PD.
+- **Portfolio Risk:** aggregate exposure, expected loss, observed default rate and concentration by segment.
+
+## Machine Learning Pipeline
+
+1. Load credit application data from a configured local dataset path.
+2. Fall back to synthetic credit data when no external dataset is available.
+3. Validate required fields, identify duplicates and handle missing values.
+4. Engineer credit risk features such as loan-to-income, utilisation flags, thin-file flags and risk rule scores.
+5. Train benchmark classification models.
+6. Evaluate model performance using classification and ranking metrics.
+7. Score applications with probability of default.
+8. Convert PD into risk bands and expected loss.
+9. Display portfolio analytics, model performance and applicant-level explanations in Streamlit.
+
+## Project Architecture
 
 ```text
 credit-risk-analytics-platform/
-  README.md
-  requirements.txt
-  .gitignore
   app.py
+  requirements.txt
+  README.md
+  CHANGELOG.md
+  ROADMAP.md
+  CONTRIBUTING.md
   data/
     raw/
     processed/
   src/
-    data_generation.py
-    preprocessing.py
-    modelling.py
     analytics.py
+    data_generation.py
+    modelling.py
+    preprocessing.py
     visualisation.py
   notebooks/
   outputs/
@@ -60,67 +66,128 @@ credit-risk-analytics-platform/
   assets/
 ```
 
-## Methodology
+## Dataset
 
-1. Generate a synthetic loan portfolio with realistic applicant risk drivers.
-2. Engineer features such as loan-to-income, high utilisation flag, thin file flag, and risk rule score.
-3. Train multiple classification models.
-4. Select the best model by ROC-AUC.
-5. Score applications with probability of default.
-6. Convert PD values into credit risk bands.
-7. Estimate expected loss using PD, LGD, and EAD.
-8. Present portfolio risk and model explanation in Streamlit.
+Version 1.0 uses a realistic synthetic loan application dataset generated locally. The dataset includes:
 
-## How To Run
+- Applicant income and age
+- Loan amount, interest rate and term
+- FICO score
+- Debt-to-income ratio
+- Credit utilisation
+- Credit history length
+- Recent inquiries
+- Delinquencies
+- Employment status
+- Home ownership
+- Loan purpose
+- Default outcome
+
+Phase 2 adds configurable support for public credit datasets while keeping synthetic data as a fallback for reproducibility.
+
+## Risk Modelling Methodology
+
+The baseline modelling workflow trains multiple classification models using engineered borrower and loan features. The best model is selected by ROC-AUC and used to produce PD estimates. PD values are translated into credit risk bands and expected loss is calculated using a configurable LGD assumption.
+
+Core modelling components:
+
+- Missing value imputation
+- Categorical one-hot encoding
+- Numeric scaling
+- Logistic Regression
+- Random Forest
+- Optional gradient-boosted models when installed
+- Model comparison by ranking and classification metrics
+- Feature importance-based explanation
+
+## Evaluation Metrics
+
+The platform reports:
+
+- ROC-AUC
+- Precision
+- Recall
+- Confusion matrix
+- Expected loss
+- Observed default rate
+- Average PD
+- Portfolio exposure
+- Risk-band distribution
+
+Phase 2 expands this with calibration, lift, precision-recall and model benchmarking views.
+
+## Dashboard Overview
+
+The Streamlit dashboard includes:
+
+- Portfolio risk summary
+- PD distribution
+- Expected loss by credit score band
+- Expected loss by loan purpose
+- Applicant explorer
+- Model explanation
+- Data preview
+
+## Installation
+
+Use Python 3.11 or newer.
 
 ```bash
+python -m venv .venv
+.venv\Scripts\activate
 pip install -r requirements.txt
+```
+
+On macOS or Linux:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+## Run Locally
+
+```bash
 python src/data_generation.py
 python src/modelling.py
 streamlit run app.py
 ```
 
-## Dashboard Screenshots
+## Screenshots
 
-Add screenshots to the `screenshots/` folder after running the app locally.
+Add screenshots after running the dashboard:
 
-Suggested screenshots:
+```text
+screenshots/portfolio-overview.png
+screenshots/risk-distribution.png
+screenshots/applicant-explorer.png
+screenshots/model-performance.png
+screenshots/explainability.png
+```
 
-- Portfolio risk summary
-- PD distribution
-- Expected loss by score band
-- Applicant explorer
-- Feature importance
+## Results
 
-## Results / Insights
+The platform demonstrates how a credit risk team could combine machine learning predictions with business risk metrics. It links applicant-level PD estimates to portfolio expected loss, score bands and explainable risk drivers.
 
-The platform helps answer:
+## Limitations
 
-- Which applicants are most likely to default?
-- Which score bands concentrate expected loss?
-- How does debt-to-income affect credit risk?
-- Which loan purposes contribute most expected loss?
-- Which features are most influential in the model?
+- Synthetic data is useful for demonstration but does not replace real model validation.
+- The current model is not calibrated for production lending.
+- No reject inference, macroeconomic stress testing or fairness review is included yet.
+- Explanations are educational and should be reviewed by qualified risk stakeholders.
 
-## Skills Demonstrated
+## Roadmap
 
-- Credit risk modelling
-- Probability of default estimation
-- Expected loss analytics
-- Model evaluation
-- Feature engineering
-- Classification pipelines
-- Streamlit dashboard development
+See [ROADMAP.md](ROADMAP.md).
 
-## Future Improvements
+## Changelog
 
-- SHAP explainability
-- Real public credit dataset option
-- Calibration curves
-- Reject inference discussion
-- IFRS 9 staging logic
-- Macroeconomic stress testing
-- Model monitoring and drift checks
+See [CHANGELOG.md](CHANGELOG.md).
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Author
 
