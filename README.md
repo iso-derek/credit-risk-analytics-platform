@@ -138,6 +138,18 @@ The platform reports:
 
 Phase 2 expands this with calibration, lift, precision-recall and model benchmarking views.
 
+## Advanced Risk Analytics
+
+The risk engine adds:
+
+- PD, LGD, EAD and expected loss fields.
+- Internal risk grades and risk bands.
+- Portfolio risk summary and expected loss rate.
+- Delinquency analysis.
+- Lift table for ranking quality.
+- ROC curve, precision-recall curve and calibration curve data.
+- Business-readable portfolio risk narrative.
+
 ## Dashboard Overview
 
 The Streamlit dashboard includes:
