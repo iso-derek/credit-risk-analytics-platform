@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from pathlib import Path
+from time import perf_counter
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.calibration import calibration_curve
-from sklearn.metrics import confusion_matrix, precision_recall_curve, precision_score, recall_score, roc_auc_score, roc_curve
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, precision_recall_curve, precision_score, recall_score, roc_auc_score, roc_curve
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
@@ -41,14 +42,33 @@ def _optional_xgboost_model():
         return None
 
 
+def _optional_lightgbm_model():
+    try:
+        from lightgbm import LGBMClassifier
+
+        return LGBMClassifier(
+            n_estimators=200,
+            learning_rate=0.05,
+            max_depth=-1,
+            random_state=42,
+            verbose=-1,
+        )
+    except Exception:
+        return None
+
+
 def build_models() -> dict[str, object]:
     models = {
         "Logistic Regression": LogisticRegression(max_iter=1000, class_weight="balanced"),
         "Random Forest": RandomForestClassifier(n_estimators=180, max_depth=8, min_samples_leaf=20, class_weight="balanced", random_state=42),
+        "Gradient Boosting": GradientBoostingClassifier(n_estimators=160, learning_rate=0.05, max_depth=3, random_state=42),
     }
     xgb = _optional_xgboost_model()
     if xgb is not None:
         models["XGBoost"] = xgb
+    lightgbm = _optional_lightgbm_model()
+    if lightgbm is not None:
+        models["LightGBM"] = lightgbm
     return models
 
 
@@ -63,8 +83,12 @@ def train_credit_models(df: pd.DataFrame | None = None) -> dict[str, object]:
     best_auc = -np.inf
     for name, model in build_models().items():
         pipe = Pipeline([("preprocessor", build_preprocessor()), ("model", model)])
+        train_start = perf_counter()
         pipe.fit(X_train, y_train)
+        training_time = perf_counter() - train_start
+        inference_start = perf_counter()
         pd_pred = pipe.predict_proba(X_test)[:, 1]
+        inference_time = perf_counter() - inference_start
         y_pred = (pd_pred >= 0.5).astype(int)
         auc = roc_auc_score(y_test, pd_pred)
         roc_fpr, roc_tpr, roc_thresholds = roc_curve(y_test, pd_pred)
@@ -72,9 +96,13 @@ def train_credit_models(df: pd.DataFrame | None = None) -> dict[str, object]:
         calibration_true, calibration_pred = calibration_curve(y_test, pd_pred, n_bins=10, strategy="quantile")
         results[name] = {
             "pipeline": pipe,
+            "accuracy": accuracy_score(y_test, y_pred),
             "roc_auc": auc,
             "precision": precision_score(y_test, y_pred, zero_division=0),
             "recall": recall_score(y_test, y_pred, zero_division=0),
+            "f1": f1_score(y_test, y_pred, zero_division=0),
+            "training_time": training_time,
+            "inference_time": inference_time,
             "confusion_matrix": confusion_matrix(y_test, y_pred),
             "roc_curve": pd.DataFrame({"fpr": roc_fpr, "tpr": roc_tpr, "threshold": roc_thresholds}),
             "precision_recall_curve": pd.DataFrame(
@@ -95,7 +123,27 @@ def train_credit_models(df: pd.DataFrame | None = None) -> dict[str, object]:
     scored = score_credit_applications(df, best_pipeline)
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
     scored.to_csv(SCORED_PATH, index=False)
-    return {"models": results, "best_model_name": best_name, "best_pipeline": best_pipeline, "scored_data": scored}
+    return {"models": results, "best_model_name": best_name, "best_pipeline": best_pipeline, "scored_data": scored, "benchmark": benchmark_table(results)}
+
+
+def benchmark_table(results: dict[str, dict[str, object]]) -> pd.DataFrame:
+    """Return a model comparison table."""
+
+    rows = []
+    for name, metrics in results.items():
+        rows.append(
+            {
+                "model": name,
+                "accuracy": metrics["accuracy"],
+                "roc_auc": metrics["roc_auc"],
+                "precision": metrics["precision"],
+                "recall": metrics["recall"],
+                "f1": metrics["f1"],
+                "training_time": metrics["training_time"],
+                "inference_time": metrics["inference_time"],
+            }
+        )
+    return pd.DataFrame(rows).sort_values("roc_auc", ascending=False)
 
 
 def score_band(probability_default: float) -> str:
