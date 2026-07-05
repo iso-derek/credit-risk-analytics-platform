@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+import logging
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -31,3 +32,12 @@ def configured_lgd(default: float = 0.45) -> float:
     except ValueError:
         return default
     return min(max(value, 0.0), 1.0)
+
+
+def configure_logging(level: int = logging.INFO) -> None:
+    """Configure basic application logging."""
+
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+    )
