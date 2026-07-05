@@ -119,6 +119,8 @@ Core modelling components:
 - Logistic Regression
 - Random Forest
 - Optional gradient-boosted models when installed
+- Gradient Boosting
+- Optional XGBoost and LightGBM when installed
 - Model comparison by ranking and classification metrics
 - Feature importance-based explanation
 
@@ -129,6 +131,10 @@ The platform reports:
 - ROC-AUC
 - Precision
 - Recall
+- Accuracy
+- F1 score
+- Training time
+- Inference time
 - Confusion matrix
 - Expected loss
 - Observed default rate

@@ -6,7 +6,6 @@ All notable changes to this project will be documented in this file.
 
 ### Planned
 
-- Add model benchmarking.
 - Add tests, CI, Docker and deployment documentation.
 
 ### Added
@@ -19,6 +18,8 @@ All notable changes to this project will be documented in this file.
 - Added explainable AI helpers with optional SHAP support.
 - Added local applicant reason codes and natural-language risk explanations.
 - Upgraded Streamlit dashboard with sidebar navigation, KPI cards, customer search, performance pages, explainability pages and export buttons.
+- Added Gradient Boosting and optional LightGBM model support.
+- Added model benchmark table with accuracy, ROC-AUC, precision, recall, F1, training time and inference time.
 
 ## [1.0.0] - 2026-06-26
 

@@ -138,6 +138,22 @@ def render_model_page(result: dict[str, object]) -> None:
     cols[1].metric("ROC-AUC", f"{best['roc_auc']:.3f}")
     cols[2].metric("Precision", f"{best['precision']:.3f}")
     cols[3].metric("Recall", f"{best['recall']:.3f}")
+    st.markdown("#### Model Benchmark")
+    st.dataframe(
+        result["benchmark"].style.format(
+            {
+                "accuracy": "{:.3f}",
+                "roc_auc": "{:.3f}",
+                "precision": "{:.3f}",
+                "recall": "{:.3f}",
+                "f1": "{:.3f}",
+                "training_time": "{:.3f}s",
+                "inference_time": "{:.3f}s",
+            }
+        ),
+        hide_index=True,
+        width="stretch",
+    )
     tab1, tab2, tab3, tab4 = st.tabs(["Confusion Matrix", "ROC", "Precision-Recall", "Calibration & Lift"])
     with tab1:
         cm = pd.DataFrame(best["confusion_matrix"], index=["Actual non-default", "Actual default"], columns=["Predicted non-default", "Predicted default"])
