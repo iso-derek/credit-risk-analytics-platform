@@ -6,8 +6,6 @@ All notable changes to this project will be documented in this file.
 
 ### Planned
 
-- Add tests, CI, Docker and deployment documentation.
-
 ### Added
 
 - Added configurable external public credit dataset path support.
@@ -20,6 +18,8 @@ All notable changes to this project will be documented in this file.
 - Upgraded Streamlit dashboard with sidebar navigation, KPI cards, customer search, performance pages, explainability pages and export buttons.
 - Added Gradient Boosting and optional LightGBM model support.
 - Added model benchmark table with accuracy, ROC-AUC, precision, recall, F1, training time and inference time.
+- Added unit tests, CI workflow, pre-commit configuration, Dockerfile, `.dockerignore` and `.env.example`.
+- Added basic logging configuration for model training.
 
 ## [1.0.0] - 2026-06-26
 

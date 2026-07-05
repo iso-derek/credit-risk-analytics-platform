@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from time import perf_counter
+import logging
 
 import numpy as np
 import pandas as pd
@@ -14,7 +15,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, precisio
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
-from config import configured_lgd
+from config import configure_logging, configured_lgd
 from data_generation import load_or_create_credit_data
 from preprocessing import build_preprocessor, engineer_features, feature_columns
 from risk_engine import enrich_risk_metrics, lift_table
@@ -23,6 +24,7 @@ from risk_engine import enrich_risk_metrics, lift_table
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
 SCORED_PATH = PROCESSED_DIR / "scored_credit_risk.csv"
+logger = logging.getLogger(__name__)
 
 
 def _optional_xgboost_model():
@@ -82,6 +84,7 @@ def train_credit_models(df: pd.DataFrame | None = None) -> dict[str, object]:
     best_name = None
     best_auc = -np.inf
     for name, model in build_models().items():
+        logger.info("Training credit risk model: %s", name)
         pipe = Pipeline([("preprocessor", build_preprocessor()), ("model", model)])
         train_start = perf_counter()
         pipe.fit(X_train, y_train)
@@ -123,6 +126,7 @@ def train_credit_models(df: pd.DataFrame | None = None) -> dict[str, object]:
     scored = score_credit_applications(df, best_pipeline)
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
     scored.to_csv(SCORED_PATH, index=False)
+    logger.info("Saved scored credit risk data to %s", SCORED_PATH)
     return {"models": results, "best_model_name": best_name, "best_pipeline": best_pipeline, "scored_data": scored, "benchmark": benchmark_table(results)}
 
 
@@ -186,6 +190,7 @@ def model_feature_importance(result: dict[str, object]) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
+    configure_logging()
     result = train_credit_models()
     best = result["best_model_name"]
     metrics = result["models"][best]

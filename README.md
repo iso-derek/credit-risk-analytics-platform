@@ -192,6 +192,12 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+## Tests
+
+```bash
+pytest
+```
+
 On macOS or Linux:
 
 ```bash
