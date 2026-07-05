@@ -170,8 +170,11 @@ The Streamlit dashboard includes:
 - Expected loss by credit score band
 - Expected loss by loan purpose
 - Applicant explorer
-- Model explanation
-- Data preview
+- Model performance page
+- Explainability page
+- Data preview and export page
+- Customer search
+- Downloadable scored predictions and portfolio reports
 
 ## Installation
 
