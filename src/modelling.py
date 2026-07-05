@@ -8,12 +8,15 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix, precision_score, recall_score, roc_auc_score
+from sklearn.calibration import calibration_curve
+from sklearn.metrics import confusion_matrix, precision_recall_curve, precision_score, recall_score, roc_auc_score, roc_curve
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
+from config import configured_lgd
 from data_generation import load_or_create_credit_data
 from preprocessing import build_preprocessor, engineer_features, feature_columns
+from risk_engine import enrich_risk_metrics, lift_table
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -64,12 +67,25 @@ def train_credit_models(df: pd.DataFrame | None = None) -> dict[str, object]:
         pd_pred = pipe.predict_proba(X_test)[:, 1]
         y_pred = (pd_pred >= 0.5).astype(int)
         auc = roc_auc_score(y_test, pd_pred)
+        roc_fpr, roc_tpr, roc_thresholds = roc_curve(y_test, pd_pred)
+        pr_precision, pr_recall, pr_thresholds = precision_recall_curve(y_test, pd_pred)
+        calibration_true, calibration_pred = calibration_curve(y_test, pd_pred, n_bins=10, strategy="quantile")
         results[name] = {
             "pipeline": pipe,
             "roc_auc": auc,
             "precision": precision_score(y_test, y_pred, zero_division=0),
             "recall": recall_score(y_test, y_pred, zero_division=0),
             "confusion_matrix": confusion_matrix(y_test, y_pred),
+            "roc_curve": pd.DataFrame({"fpr": roc_fpr, "tpr": roc_tpr, "threshold": roc_thresholds}),
+            "precision_recall_curve": pd.DataFrame(
+                {
+                    "precision": pr_precision,
+                    "recall": pr_recall,
+                    "threshold": np.append(pr_thresholds, np.nan),
+                }
+            ),
+            "calibration_curve": pd.DataFrame({"observed_default_rate": calibration_true, "mean_predicted_pd": calibration_pred}),
+            "lift_table": lift_table(y_test, pd_pred),
         }
         if auc > best_auc:
             best_name = name
@@ -94,14 +110,14 @@ def score_band(probability_default: float) -> str:
     return "E - Very High Risk"
 
 
-def score_credit_applications(df: pd.DataFrame, pipeline: Pipeline, lgd: float = 0.45) -> pd.DataFrame:
+def score_credit_applications(df: pd.DataFrame, pipeline: Pipeline, lgd: float | None = None) -> pd.DataFrame:
     output = engineer_features(df)
     output["probability_default"] = pipeline.predict_proba(output[feature_columns()])[:, 1]
     output["credit_score_band"] = output["probability_default"].apply(score_band)
     output["ead"] = output["loan_amount"]
-    output["lgd"] = lgd
+    output["lgd"] = configured_lgd() if lgd is None else lgd
     output["expected_loss"] = output["probability_default"] * output["lgd"] * output["ead"]
-    return output
+    return enrich_risk_metrics(output, lgd=float(output["lgd"].iloc[0]))
 
 
 def model_feature_importance(result: dict[str, object]) -> pd.DataFrame:
