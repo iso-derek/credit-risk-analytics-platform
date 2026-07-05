@@ -20,6 +20,8 @@ All notable changes to this project will be documented in this file.
 - Added model benchmark table with accuracy, ROC-AUC, precision, recall, F1, training time and inference time.
 - Added unit tests, CI workflow, pre-commit configuration, Dockerfile, `.dockerignore` and `.env.example`.
 - Added basic logging configuration for model training.
+- Added deployment guide for Streamlit Cloud, Render and Docker.
+- Added tracked Streamlit runtime configuration.
 
 ## [1.0.0] - 2026-06-26
 
