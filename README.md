@@ -150,6 +150,17 @@ The risk engine adds:
 - ROC curve, precision-recall curve and calibration curve data.
 - Business-readable portfolio risk narrative.
 
+## Explainable AI
+
+The explainability layer provides:
+
+- Global feature importance from the best model.
+- Local reason codes for individual applicants.
+- Natural-language risk reasons, for example: "This applicant has elevated default risk because of high utilisation and previous delinquencies."
+- Optional SHAP summary support when `shap` is installed.
+
+The app remains usable without SHAP by falling back to model feature importance and rule-based credit risk reason codes.
+
 ## Dashboard Overview
 
 The Streamlit dashboard includes:

@@ -6,7 +6,6 @@ All notable changes to this project will be documented in this file.
 
 ### Planned
 
-- Add explainable AI views.
 - Upgrade Streamlit dashboard navigation and reporting.
 - Add model benchmarking.
 - Add tests, CI, Docker and deployment documentation.
@@ -18,6 +17,8 @@ All notable changes to this project will be documented in this file.
 - Added synthetic fallback data handling when external data is unavailable.
 - Added credit risk engine metrics for PD, LGD, EAD, expected loss, risk grades and delinquency analysis.
 - Added ROC, precision-recall, calibration and lift table outputs for model evaluation.
+- Added explainable AI helpers with optional SHAP support.
+- Added local applicant reason codes and natural-language risk explanations.
 
 ## [1.0.0] - 2026-06-26
 

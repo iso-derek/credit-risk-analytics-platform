@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import pandas as pd
 
+from explainability import risk_reason_generator
+
 
 def portfolio_summary(df: pd.DataFrame) -> dict[str, float]:
     return {
@@ -32,17 +34,4 @@ def purpose_summary(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def applicant_explanation(row: pd.Series) -> str:
-    reasons = []
-    if row.get("fico_score", 850) < 620:
-        reasons.append("low FICO score")
-    if row.get("debt_to_income", 0) >= 0.40:
-        reasons.append("high debt-to-income")
-    if row.get("credit_utilisation", 0) >= 0.65:
-        reasons.append("high credit utilisation")
-    if row.get("num_delinquencies", 0) >= 2:
-        reasons.append("recent delinquencies")
-    if row.get("recent_inquiries", 0) >= 4:
-        reasons.append("high recent credit inquiries")
-    if not reasons:
-        return "Risk mainly driven by model interactions rather than a single rule."
-    return "Applicant risk driven by " + ", ".join(reasons) + "."
+    return risk_reason_generator(row)

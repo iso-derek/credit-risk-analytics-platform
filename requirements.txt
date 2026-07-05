@@ -4,3 +4,4 @@ scikit-learn
 streamlit
 plotly
 python-dateutil
+# Optional: install shap for SHAP-based explainability.
