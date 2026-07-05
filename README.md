@@ -214,6 +214,22 @@ python src/modelling.py
 streamlit run app.py
 ```
 
+## Deployment
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+Supported paths:
+
+- Streamlit Community Cloud
+- Render
+- Docker
+
+Streamlit health checks are available at:
+
+```text
+/_stcore/health
+```
+
 ## Screenshots
 
 Add screenshots after running the dashboard:
