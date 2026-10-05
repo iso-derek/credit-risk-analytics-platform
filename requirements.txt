@@ -4,3 +4,4 @@ scikit-learn
 streamlit
 plotly
 python-dateutil
+requests>=2.31
