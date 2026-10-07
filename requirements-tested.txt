@@ -1,0 +1,10 @@
+# Direct dependency versions used for the reproducible compatibility target.
+# This is not a complete transitive lockfile. Optional model backends are separate.
+-r requirements.txt
+numpy==2.2.6
+pandas==2.2.3
+scipy==1.15.3
+scikit-learn==1.8.0
+streamlit==1.65.0
+plotly==7.1.0
+
