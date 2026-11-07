@@ -92,17 +92,22 @@ python scripts/run_research.py
 streamlit run app.py
 ```
 
-## Dashboard Screenshots
+## Dashboard screenshots
 
-Add screenshots to the `screenshots/` folder after running the app locally.
+### Held-out portfolio
 
-Suggested screenshots:
+![Held-out synthetic portfolio dashboard](screenshots/portfolio-release.png)
 
-- Portfolio risk summary
-- PD distribution
-- Expected loss by score band
-- Applicant explorer
-- Feature importance
+### Drift monitoring
+
+![Training-reference to final-test drift diagnostics](screenshots/drift-release.png)
+
+### Subgroup diagnostics
+
+![Held-out subgroup diagnostic controls](screenshots/subgroup-release.png)
+
+These screenshots use synthetic demonstration data and verify rendering, not lending
+performance. See the [release acceptance rehearsal](docs/RELEASE_ACCEPTANCE.md).
 
 ## Results / Insights
 

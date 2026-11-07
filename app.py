@@ -38,7 +38,12 @@ with st.container(horizontal=True):
 overview,evidence,monitoring,subgroups,applicant,scenarios,research=st.tabs(['Portfolio','Model evidence','Drift monitoring','Subgroup diagnostics','Applicant sensitivity','Loss scenarios','Research exports'])
 with overview:
     st.subheader('Probability distribution')
-    st.plotly_chart(px.histogram(df,x='probability_default',color='credit_score_band',nbins=30),width='stretch',alt='Held-out applicant default probabilities by credit score band')
+    probability_chart=px.histogram(
+        df,x='probability_default',color='credit_score_band',nbins=30,
+        labels={'probability_default':'Predicted default probability','credit_score_band':'Credit score band','count':'Applicants'},
+    )
+    probability_chart.update_layout(legend_title_text='Credit score band',yaxis_title_text='Applicants')
+    st.plotly_chart(probability_chart,width='stretch',alt='Held-out applicant default probabilities by credit score band')
     st.dataframe(df[['application_id','credit_score_band','probability_default','ead','expected_loss']],hide_index=True,alt='Held-out applicant probability and expected-loss details')
     st.subheader('Held-out data coverage')
     coverage=missingness_summary(df,spec['numeric']+spec['categorical'])
@@ -88,7 +93,9 @@ with monitoring:
         st.metric('Higher feature signals',f"{(drift.shift_signal=='Higher shift signal').sum():,}",border=True)
         st.metric('Features reviewed',f'{len(drift):,}',border=True)
     st.caption(f"Score-distribution signal: {score_drift['shift_signal']}. PSI bins are fixed from the training reference; unseen categories and missing values receive explicit buckets.")
-    st.bar_chart(drift.head(10),x='feature',y='psi',color='feature_type',y_label='Population Stability Index',alt='Largest predictor distribution shift signals between training reference and final test')
+    drift_chart=drift.head(10).copy()
+    drift_chart['feature_label']=drift_chart.feature.str.replace('_',' ',regex=False).str.title()
+    st.bar_chart(drift_chart,x='feature_label',y='psi',color='feature_type',x_label='Model input',y_label='Population Stability Index',alt='Largest predictor distribution shift signals between training reference and final test')
     st.dataframe(
         drift,
         hide_index=True,

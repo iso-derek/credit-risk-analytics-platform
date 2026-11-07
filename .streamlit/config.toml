@@ -1,0 +1,24 @@
+[client]
+toolbarMode = "viewer"
+
+[theme]
+base = "light"
+primaryColor = "#0F6CBD"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F3F6FA"
+textColor = "#172033"
+linkColor = "#0F6CBD"
+borderColor = "#D7DEE8"
+showWidgetBorder = true
+showSidebarBorder = true
+baseRadius = "8px"
+font = "sans-serif"
+headingFont = "sans-serif"
+chartCategoricalColors = ["#0F6CBD", "#2D9D78", "#6B5DD3", "#D97A32", "#C94F6D", "#6C7A89", "#1F8A9E"]
+
+[theme.sidebar]
+backgroundColor = "#F3F6FA"
+secondaryBackgroundColor = "#E8EEF6"
+textColor = "#172033"
+borderColor = "#D7DEE8"
+primaryColor = "#0F6CBD"
