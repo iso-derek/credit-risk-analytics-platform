@@ -1,7 +1,7 @@
 # Development status
 
 **Updated:** 7 November 2026
-**Phase:** Project B, milestone B5 — reference-to-holdout drift contracts
+**Phase:** Project B, milestone B6 — release acceptance rehearsal
 
 ## Completed through this branch
 
@@ -26,34 +26,39 @@
   and two-outcome suppression contract.
 - Added fixed-reference PSI for predictors and scores, explicit unseen/missing
   buckets, missing-rate deltas and non-production interpretation limits.
+- Completed clean launcher setup, launcher tests, recorded synthetic research,
+  loopback health check and readiness-gated Chromium screenshots.
+- Added native financial-dashboard theming and analyst-facing chart labels without
+  custom CSS.
 
-## Tests
+## Tests and acceptance
 
-- Fresh isolated Python 3.12 baseline: 13 tests passed in 4.164 seconds.
+- Fresh launcher-created Python 3.12 environment: 26 tests passed.
 - Python compilation passed and `pip check` reported no broken requirements.
-- The tests mutate final-test outcomes and verify that model choice and predictions
-  do not change, while final-test metrics do change.
+- Tests cover final-test isolation, subgroup suppression and uncertainty, portfolio
+  reconciliation, drift bins, exports, launcher provenance and Streamlit controls.
+- Readiness-gated Chromium captures verify the Portfolio, Drift monitoring and
+  Subgroup diagnostics views after real rendering.
 
 ## Known issues and blockers
 
 - Subgroup evidence is conditional on one holdout cohort and is not a regulatory
-  fairness assessment; intersectional and temporal evidence remain absent.
+  fairness assessment; temporal evidence remains absent.
 - The real benchmark is one 2005 Taiwan credit-card cohort; transfer and temporal
   validity are not established.
 - LGD is assumed and statement balance is an exposure proxy, not observed loss.
-- Main has no reviewed visual acceptance, complete documentation, or deployment
-  acceptance. Older PRs #9–16 must not be bulk-merged.
+- No public deployment or private-host rehearsal has been approved. Older PRs #9–16
+  must not be bulk-merged.
 
 ## Next three priorities
 
-1. Reconcile only safe UI/documentation ideas from the older stack.
-2. Perform real screenshots, clean-install and deployment rehearsal.
-3. Define production monitoring ownership and timestamped cohort requirements.
-   real screenshots, clean-install and deployment rehearsal.
+1. Choose and approve a Python-compatible hosting target for a private demo rehearsal.
+2. Define production monitoring ownership and timestamped cohort requirements.
+3. Obtain external or temporal validation before broadening research claims.
 
 ## Remaining before stable release
 
-- Subgroup/fairness evidence without regulatory-compliance claims.
+- Independent review of subgroup/fairness evidence without regulatory-compliance claims.
 - External or temporal validation, or tightly constrained transfer claims.
-- Analyst workflow polish, comprehensive README, screenshots and acceptance tests.
+- Private-host deployment rehearsal and operating-owner acceptance.
 - Security/dependency review and explicit approval before merge or deployment.
