@@ -1,0 +1,6 @@
+{
+  "name": "Credit Risk Analytics Platform",
+  "app": "app.py",
+  "port": 8502
+}
+

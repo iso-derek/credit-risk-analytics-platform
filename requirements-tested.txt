@@ -1,0 +1,11 @@
+# Direct dependency versions used for the reproducible compatibility target.
+# Transitive packages are resolved by pip; optional model backends are separate.
+numpy==2.2.6
+pandas==2.2.3
+scipy==1.15.3
+scikit-learn==1.8.0
+streamlit==1.65.0
+plotly==7.1.0
+python-dateutil==4.0.0
+requests==2.34.2
+

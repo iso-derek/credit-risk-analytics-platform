@@ -1,5 +1,11 @@
 # Credit Risk Analytics Platform
 
+> Development status: the protected research baseline and portable launch/CI
+> tooling are reconciled on a dedicated branch. See
+> [docs/DEVELOPMENT_STATUS.md](docs/DEVELOPMENT_STATUS.md) for verified evidence,
+> blockers and the next milestone. Older modelling PRs are not part of this
+> baseline because they would weaken final-test isolation.
+
 ## Overview
 
 Credit Risk Analytics Platform is a Python data science project for loan default prediction, probability of default modelling, credit score banding, and expected loss analysis. It uses a realistic synthetic loan dataset and includes a Streamlit dashboard for portfolio and applicant-level risk review.
@@ -150,3 +156,6 @@ See [research protocol](docs/RESEARCH_PROTOCOL.md) and [recorded run](docs/RESEA
 The public adapter preserves Taiwan-dollar units and uses statement balance as an
 exposure proxy; it does not invent income or FICO values. Raw public data is fetched
 from UCI on request, not redistributed here.
+# One-command local launch
+
+On Windows with Python 3.13, double-click `Start.cmd`, or run `py -3.13 launch.py` in this folder. Python 3.12 is also supported. See [quick start and research history](docs/QUICKSTART.md).
