@@ -9,7 +9,7 @@ from data_sources import synthetic_dataset, download_public_credit
 from analytics import concentration_summary, missingness_summary, segment_loss_summary
 from modelling import train_credit_models, model_feature_importance, applicant_sensitivity
 from research import compare_selections, loss_scenarios, result_bundle
-from subgroup import add_audit_groups, available_group_columns, subgroup_diagnostics
+from subgroup import add_audit_groups, add_intersection_group, available_group_columns, subgroup_diagnostics
 
 st.set_page_config(page_title='Credit Risk Research',layout='wide')
 st.title('Credit Risk Analytics & Research')
@@ -86,9 +86,17 @@ with subgroups:
     else:
         labels={'employment_status':'Employment status','home_ownership':'Home ownership','loan_purpose':'Loan purpose','age_band':'Age band','SEX':'Sex code','EDUCATION':'Education code','MARRIAGE':'Marital-status code'}
         group_column=st.selectbox('Evaluation group',group_options,format_func=lambda value:labels.get(value,value),key='audit_group')
+        use_intersection=st.toggle('Add a second grouping field',value=False,key='audit_intersection_enabled')
+        if use_intersection:
+            second_options=[column for column in group_options if column!=group_column]
+            second_column=st.selectbox('Second evaluation group',second_options,format_func=lambda value:labels.get(value,value),key='audit_second_group')
+            audit_df=add_intersection_group(audit_df,group_column,second_column)
+            audit_group_column='intersection'
+        else:
+            audit_group_column=group_column
         threshold=st.slider('High-risk flag threshold',.05,.80,.20,.05,key='audit_threshold')
         min_group_size=st.slider('Minimum group size',10,100,30,5,key='audit_minimum')
-        audit=subgroup_diagnostics(audit_df,group_column,threshold,min_group_size,bootstrap_draws=500,seed=result['seed'])
+        audit=subgroup_diagnostics(audit_df,audit_group_column,threshold,min_group_size,bootstrap_draws=500,seed=result['seed'])
         reported=audit[audit.status=='Reported']
         with st.container(horizontal=True):
             st.metric('Groups reported',f'{len(reported):,}',border=True)
@@ -109,7 +117,7 @@ with subgroups:
             },
         )
         st.caption('Intervals are 95% applicant-level bootstrap intervals conditional on the fitted model and this final-test cohort. Groups below the minimum size or with one observed outcome are suppressed; results do not establish transfer, causal or legal fairness.')
-        st.download_button('Download subgroup diagnostics',audit.to_csv(index=False),f'credit_subgroup_{group_column}.csv','text/csv')
+        st.download_button('Download subgroup diagnostics',audit.to_csv(index=False),f'credit_subgroup_{audit_group_column}.csv','text/csv')
 with applicant:
     choice=st.selectbox('Held-out applicant',df.application_id.tolist())
     row=df[df.application_id==choice].iloc[0]

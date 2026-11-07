@@ -6,7 +6,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from subgroup import add_audit_groups, available_group_columns, subgroup_diagnostics
+from subgroup import add_audit_groups, add_intersection_group, available_group_columns, subgroup_diagnostics
 
 
 class SubgroupTests(unittest.TestCase):
@@ -49,6 +49,19 @@ class SubgroupTests(unittest.TestCase):
                 subgroup_diagnostics(self.frame, "segment", **kwargs)
         with self.assertRaisesRegex(ValueError, "Missing subgroup fields"):
             subgroup_diagnostics(self.frame, "unknown")
+
+    def test_intersection_combines_only_supported_distinct_fields(self):
+        frame = self.frame.assign(
+            age=[22, 31, 42, 55, 65, 29, 39, 49, 59, 69, 25, 35],
+            employment_status=["Employed", "Other"] * 6,
+        )
+        result = add_intersection_group(frame, "employment_status", "age_band")
+        self.assertIn("intersection", result)
+        self.assertTrue(result.intersection.str.contains(" × ", regex=False).all())
+        with self.assertRaisesRegex(ValueError, "different"):
+            add_intersection_group(frame, "age_band", "age_band")
+        with self.assertRaisesRegex(ValueError, "supported"):
+            add_intersection_group(frame, "employment_status", "application_id")
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 # Development status
 
 **Updated:** 7 November 2026
-**Phase:** Project B, milestone B3 — portfolio coverage and concentration
+**Phase:** Project B, milestone B4 — sample-aware intersectional diagnostics
 
 ## Completed through this branch
 
@@ -22,6 +22,8 @@
 - Added raw held-out predictor missingness before pipeline imputation.
 - Added reconciling segment exposure and expected-loss shares with descriptive HHI
   concentration measures and explicit assumption limits.
+- Added optional two-field subgroup intersections under the existing minimum-size
+  and two-outcome suppression contract.
 
 ## Tests
 
@@ -42,9 +44,9 @@
 
 ## Next three priorities
 
-1. Add intersectional subgroup views only where sample support is sufficient.
-2. Add model and data drift monitoring contracts with reference-period limits.
-3. Reconcile only safe UI/documentation ideas from the older stack, then perform
+1. Add model and data drift monitoring contracts with reference-period limits.
+2. Reconcile only safe UI/documentation ideas from the older stack.
+3. Perform real screenshots, clean-install and deployment rehearsal.
    real screenshots, clean-install and deployment rehearsal.
 
 ## Remaining before stable release

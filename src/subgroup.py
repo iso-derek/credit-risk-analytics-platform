@@ -29,6 +29,22 @@ def available_group_columns(scored: pd.DataFrame) -> list[str]:
     return [column for column in candidates if column in frame and frame[column].nunique(dropna=True) > 1]
 
 
+def add_intersection_group(scored: pd.DataFrame, first: str, second: str, output: str = "intersection") -> pd.DataFrame:
+    """Combine two supported evaluation fields without changing model inputs."""
+    frame = add_audit_groups(scored)
+    supported = available_group_columns(frame)
+    if first == second:
+        raise ValueError("Intersection fields must be different.")
+    if first not in supported or second not in supported:
+        raise ValueError("Intersection fields must be supported subgroup columns.")
+    if output in frame and output not in {first, second}:
+        raise ValueError(f"Intersection output already exists: {output}")
+    left = frame[first].astype("string").fillna("Missing")
+    right = frame[second].astype("string").fillna("Missing")
+    frame[output] = left + " × " + right
+    return frame
+
+
 def _bootstrap_intervals(y: np.ndarray, p: np.ndarray, draws: int, seed: int) -> tuple[float, float, float, float]:
     rng = np.random.default_rng(seed)
     observed, gaps = np.empty(draws), np.empty(draws)

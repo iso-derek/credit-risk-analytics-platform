@@ -27,3 +27,11 @@ gap include 95% applicant-level bootstrap intervals.
 
 The downloadable CSV records both reported and suppressed groups so limitations
 remain visible in downstream review.
+
+## Intersectional view
+
+The optional second grouping field combines two supported evaluation dimensions.
+The same minimum-size and two-outcome suppression rules apply to every intersection.
+Sparse combinations therefore remain visible as suppressed rows instead of receiving
+unstable metrics. This is exploratory evidence, not proof that unreported or
+suppressed intersections perform equivalently.

@@ -30,7 +30,7 @@ Lenders and fintech teams need to evaluate applicant risk, estimate probability 
 - Expected loss calculation using PD, LGD, and EAD
 - ROC-AUC, average precision, Brier score, log loss and reliability plots
 - Held-out subgroup calibration, discrimination and threshold-error diagnostics
-  with bootstrap uncertainty and minimum-sample suppression
+  with bootstrap uncertainty, optional intersections and minimum-sample suppression
 - Raw held-out missingness plus reconciling segment exposure, expected-loss shares
   and descriptive concentration measures
 - Feature importance explanation
