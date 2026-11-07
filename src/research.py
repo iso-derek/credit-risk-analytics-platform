@@ -4,6 +4,7 @@ import json
 import zipfile
 import numpy as np
 import pandas as pd
+from monitoring import feature_drift_table, score_drift_summary
 
 
 def loss_scenarios(scored, odds_multiplier=1., lgd=.45, exposure_multiplier=1.):
@@ -37,11 +38,14 @@ def result_bundle(result):
     predictions=pd.DataFrame(result['test_probabilities'])
     predictions.insert(0,'default',result['scored_data'].default.to_numpy())
     predictions.insert(0,'application_id',result['scored_data'].application_id.to_numpy())
+    drift=feature_drift_table(result['reference_X'],result['scored_data'],result['spec']['numeric'],result['spec']['categorical'])
+    score_drift=score_drift_summary(result['reference_scores'],result['scored_data'].probability_default)
     metadata={'seed':result['seed'],'data_sha256':result['data_sha256'],'dataset':result['spec'],
-              'selection_rule':'validation log loss','lgd':float(result['scored_data'].lgd.iloc[0]),'comparison':compare_selections(result)}
+              'selection_rule':'validation log loss','lgd':float(result['scored_data'].lgd.iloc[0]),
+              'comparison':compare_selections(result),'score_drift':score_drift}
     with zipfile.ZipFile(stream,'w',zipfile.ZIP_DEFLATED) as z:
         for name,frame in [('metrics',pd.DataFrame(rows)),('splits',result['split_manifest']),('test_predictions',predictions),
-                           ('heldout_portfolio',result['scored_data']),('reliability',result['reliability'])]:
+                           ('heldout_portfolio',result['scored_data']),('reliability',result['reliability']),('feature_drift',drift)]:
             z.writestr(name+'.csv',frame.to_csv(index=False))
         z.writestr('settings.json',json.dumps(metadata,indent=2))
     return stream.getvalue()

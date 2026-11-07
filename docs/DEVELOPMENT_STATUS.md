@@ -1,9 +1,9 @@
 # Development status
 
 **Updated:** 7 November 2026
-**Phase:** Project B, milestone B1 — protected baseline reconciliation
+**Phase:** Project B, milestone B5 — reference-to-holdout drift contracts
 
-## Completed on this branch
+## Completed through this branch
 
 - Selectively ported PR #18's launchers, compatibility CI, tested dependency target,
   quick start, project metadata and research-run evidence without importing any
@@ -14,6 +14,18 @@
 - Added explicit applicant-ID regression checks proving the reported portfolio is
   exactly the final test set and excludes train, calibration and validation IDs.
 - Pinned all eight direct dependencies used by compatibility CI.
+- Added final-test-only subgroup discrimination, calibration and threshold-error
+  diagnostics with deterministic applicant-bootstrap uncertainty.
+- Added explicit suppression for small groups and groups with only one observed
+  outcome, plus downloadable audit output and interpretation limits.
+- Kept UCI demographic evaluation fields outside the model predictor contract.
+- Added raw held-out predictor missingness before pipeline imputation.
+- Added reconciling segment exposure and expected-loss shares with descriptive HHI
+  concentration measures and explicit assumption limits.
+- Added optional two-field subgroup intersections under the existing minimum-size
+  and two-outcome suppression contract.
+- Added fixed-reference PSI for predictors and scores, explicit unseen/missing
+  buckets, missing-rate deltas and non-production interpretation limits.
 
 ## Tests
 
@@ -24,7 +36,8 @@
 
 ## Known issues and blockers
 
-- No subgroup fairness audit or subgroup uncertainty is implemented yet.
+- Subgroup evidence is conditional on one holdout cohort and is not a regulatory
+  fairness assessment; intersectional and temporal evidence remain absent.
 - The real benchmark is one 2005 Taiwan credit-card cohort; transfer and temporal
   validity are not established.
 - LGD is assumed and statement balance is an exposure proxy, not observed loss.
@@ -33,10 +46,9 @@
 
 ## Next three priorities
 
-1. Add subgroup discrimination, calibration and threshold-error diagnostics with
-   uncertainty and explicit minimum-sample limitations.
-2. Add accessible missingness, segment and expected-loss portfolio diagnostics.
-3. Reconcile only safe UI/documentation ideas from the older stack, then perform
+1. Reconcile only safe UI/documentation ideas from the older stack.
+2. Perform real screenshots, clean-install and deployment rehearsal.
+3. Define production monitoring ownership and timestamped cohort requirements.
    real screenshots, clean-install and deployment rehearsal.
 
 ## Remaining before stable release

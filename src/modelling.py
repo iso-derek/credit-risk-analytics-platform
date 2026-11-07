@@ -111,6 +111,7 @@ def train_credit_models(df=None,spec=None,seed=42,models=None,partitions=None,lg
             'best_pipeline':candidates[best],'scored_data':scored,'test_probabilities':probabilities,
             'reliability':reliability_table(y.iloc[te],probabilities[best]),'split_manifest':manifest,'spec':spec,
             'seed':seed,'reference':reference,'validation_X':X.iloc[va],'validation_y':y.iloc[va],
+            'reference_X':X.iloc[tr].copy(),'reference_scores':candidates[best].predict_proba(X.iloc[tr])[:,1],
             'data_sha256':hashlib.sha256(df.to_csv(index=False).encode()).hexdigest()}
 
 

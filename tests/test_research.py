@@ -63,6 +63,8 @@ class ResearchTests(unittest.TestCase):
         settings=json.loads(z.read('settings.json'))
         self.assertEqual(settings['data_sha256'],self.result['data_sha256'])
         self.assertIn('splits.csv',z.namelist())
+        self.assertIn('feature_drift.csv',z.namelist())
+        self.assertIn('score_drift',settings)
         self.assertEqual(compare_selections(self.result,100),compare_selections(self.result,100))
     def test_reliability_counts_cover_holdout(self):
         self.assertEqual(self.result['reliability'].applicants.sum(),len(self.result['scored_data']))
@@ -72,7 +74,17 @@ class AppTests(unittest.TestCase):
         from streamlit.testing.v1 import AppTest
         app=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py')).run(timeout=60)
         self.assertFalse(app.exception)
-        app.slider[0].set_value(2.).run(timeout=60)
+        self.assertTrue(any('Predictor drift' in dataframe.proto.alt for dataframe in app.dataframe))
+        self.assertEqual(app.selectbox(key='portfolio_segment').value,'credit_score_band')
+        app.selectbox(key='portfolio_segment').select('loan_purpose').run(timeout=60)
+        self.assertFalse(app.exception)
+        self.assertEqual(app.selectbox(key='audit_group').value,'employment_status')
+        app.toggle(key='audit_intersection_enabled').set_value(True).run(timeout=60)
+        self.assertFalse(app.exception)
+        self.assertEqual(app.selectbox(key='audit_second_group').value,'home_ownership')
+        app.slider(key='audit_threshold').set_value(.30).run(timeout=60)
+        self.assertFalse(app.exception)
+        app.slider(key='scenario_odds').set_value(2.).run(timeout=60)
         self.assertFalse(app.exception)
 
 if __name__=='__main__': unittest.main()
