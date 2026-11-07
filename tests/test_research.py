@@ -72,6 +72,9 @@ class AppTests(unittest.TestCase):
         from streamlit.testing.v1 import AppTest
         app=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app.py')).run(timeout=60)
         self.assertFalse(app.exception)
+        self.assertEqual(app.selectbox(key='portfolio_segment').value,'credit_score_band')
+        app.selectbox(key='portfolio_segment').select('loan_purpose').run(timeout=60)
+        self.assertFalse(app.exception)
         self.assertEqual(app.selectbox(key='audit_group').value,'employment_status')
         app.slider(key='audit_threshold').set_value(.30).run(timeout=60)
         self.assertFalse(app.exception)

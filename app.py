@@ -6,6 +6,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 from data_sources import synthetic_dataset, download_public_credit
+from analytics import concentration_summary, missingness_summary, segment_loss_summary
 from modelling import train_credit_models, model_feature_importance, applicant_sensitivity
 from research import compare_selections, loss_scenarios, result_bundle
 from subgroup import add_audit_groups, available_group_columns, subgroup_diagnostics
@@ -35,8 +36,36 @@ with st.container(horizontal=True):
     st.metric('Expected loss (assumed LGD)',f"{spec['currency']} {df.expected_loss.sum():,.0f}",border=True)
 overview,evidence,subgroups,applicant,scenarios,research=st.tabs(['Portfolio','Model evidence','Subgroup diagnostics','Applicant sensitivity','Loss scenarios','Research exports'])
 with overview:
+    st.subheader('Probability distribution')
     st.plotly_chart(px.histogram(df,x='probability_default',color='credit_score_band',nbins=30),width='stretch',alt='Held-out applicant default probabilities by credit score band')
     st.dataframe(df[['application_id','credit_score_band','probability_default','ead','expected_loss']],hide_index=True,alt='Held-out applicant probability and expected-loss details')
+    st.subheader('Held-out data coverage')
+    coverage=missingness_summary(df,spec['numeric']+spec['categorical'])
+    missing_cells=int(coverage.missing_applicants.sum())
+    with st.container(horizontal=True):
+        st.metric('Input fields reviewed',f'{len(coverage):,}',border=True)
+        st.metric('Missing held-out cells',f'{missing_cells:,}',border=True)
+        st.metric('Fields with missing values',f'{(coverage.missing_applicants>0).sum():,}',border=True)
+    st.dataframe(
+        coverage,
+        hide_index=True,
+        alt='Missing-value coverage for held-out model input fields',
+        column_config={'missing_rate':st.column_config.NumberColumn('Missing rate',format='percent')},
+    )
+    st.caption('Coverage is measured on raw held-out fields before the fitted preprocessing pipeline imputes missing values. Complete coverage does not establish data accuracy or representativeness.')
+    st.subheader('Segment exposure and expected loss')
+    segment_candidates=[column for column in ['credit_score_band','loan_purpose','employment_status','home_ownership'] if column in df and df[column].nunique(dropna=False)>1]
+    segment_column=st.selectbox('Portfolio segment',segment_candidates,format_func=lambda value:value.replace('_',' ').capitalize(),key='portfolio_segment')
+    segment_table=segment_loss_summary(df,segment_column)
+    concentration=concentration_summary(segment_table)
+    with st.container(horizontal=True):
+        st.metric('Largest exposure share',f"{concentration['largest_exposure_share']:.1%}",border=True)
+        st.metric('Largest expected-loss share',f"{concentration['largest_expected_loss_share']:.1%}",border=True)
+        st.metric('Expected-loss HHI',f"{concentration['expected_loss_hhi']:.3f}",border=True)
+    st.bar_chart(segment_table,x='segment',y='expected_loss_share',y_label='Expected-loss share',alt='Expected-loss share across the selected held-out portfolio segments')
+    segment_formats={column:st.column_config.NumberColumn(format='percent') for column in ['mean_predicted_pd','observed_default_rate','applicant_share','exposure_share','expected_loss_share'] if column in segment_table}
+    st.dataframe(segment_table,hide_index=True,alt='Exposure, default risk and expected loss by selected portfolio segment',column_config=segment_formats)
+    st.caption('Concentration is descriptive, conditional on assumed 45% LGD and the exposure proxy. HHI ranges from near zero for diffuse shares to one for a single segment; no policy limit is implied.')
 with evidence:
     st.write('Probability model selected using validation log loss:',result['best_model_name'])
     st.caption('55% training → 15% calibration → 15% model selection → 15% final testing. Final test results do not choose the model.')

@@ -1,7 +1,7 @@
 # Development status
 
 **Updated:** 7 November 2026
-**Phase:** Project B, milestone B2 — held-out subgroup diagnostics
+**Phase:** Project B, milestone B3 — portfolio coverage and concentration
 
 ## Completed through this branch
 
@@ -19,6 +19,9 @@
 - Added explicit suppression for small groups and groups with only one observed
   outcome, plus downloadable audit output and interpretation limits.
 - Kept UCI demographic evaluation fields outside the model predictor contract.
+- Added raw held-out predictor missingness before pipeline imputation.
+- Added reconciling segment exposure and expected-loss shares with descriptive HHI
+  concentration measures and explicit assumption limits.
 
 ## Tests
 
@@ -39,8 +42,8 @@
 
 ## Next three priorities
 
-1. Add accessible missingness, segment and expected-loss portfolio diagnostics.
-2. Add intersectional subgroup views only where sample support is sufficient.
+1. Add intersectional subgroup views only where sample support is sufficient.
+2. Add model and data drift monitoring contracts with reference-period limits.
 3. Reconcile only safe UI/documentation ideas from the older stack, then perform
    real screenshots, clean-install and deployment rehearsal.
 

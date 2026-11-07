@@ -31,6 +31,8 @@ Lenders and fintech teams need to evaluate applicant risk, estimate probability 
 - ROC-AUC, average precision, Brier score, log loss and reliability plots
 - Held-out subgroup calibration, discrimination and threshold-error diagnostics
   with bootstrap uncertainty and minimum-sample suppression
+- Raw held-out missingness plus reconciling segment exposure, expected-loss shares
+  and descriptive concentration measures
 - Feature importance explanation
 - Streamlit dashboard for applicant and portfolio risk
 
@@ -159,6 +161,8 @@ python scripts/run_research.py --dataset uci --output outputs/uci_study.zip
 See [research protocol](docs/RESEARCH_PROTOCOL.md) and [recorded run](docs/RESEARCH_RESULTS.md).
 See [subgroup diagnostics](docs/SUBGROUP_DIAGNOSTICS.md) for metric definitions,
 suppression rules and the limits of fairness interpretation.
+See [portfolio diagnostics](docs/PORTFOLIO_DIAGNOSTICS.md) for coverage timing,
+reconciliation and concentration assumptions.
 The public adapter preserves Taiwan-dollar units and uses statement balance as an
 exposure proxy; it does not invent income or FICO values. Raw public data is fetched
 from UCI on request, not redistributed here.
