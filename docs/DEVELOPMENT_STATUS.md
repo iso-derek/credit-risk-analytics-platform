@@ -1,9 +1,9 @@
 # Development status
 
 **Updated:** 7 November 2026
-**Phase:** Project B, milestone B1 — protected baseline reconciliation
+**Phase:** Project B, milestone B2 — held-out subgroup diagnostics
 
-## Completed on this branch
+## Completed through this branch
 
 - Selectively ported PR #18's launchers, compatibility CI, tested dependency target,
   quick start, project metadata and research-run evidence without importing any
@@ -14,6 +14,11 @@
 - Added explicit applicant-ID regression checks proving the reported portfolio is
   exactly the final test set and excludes train, calibration and validation IDs.
 - Pinned all eight direct dependencies used by compatibility CI.
+- Added final-test-only subgroup discrimination, calibration and threshold-error
+  diagnostics with deterministic applicant-bootstrap uncertainty.
+- Added explicit suppression for small groups and groups with only one observed
+  outcome, plus downloadable audit output and interpretation limits.
+- Kept UCI demographic evaluation fields outside the model predictor contract.
 
 ## Tests
 
@@ -24,7 +29,8 @@
 
 ## Known issues and blockers
 
-- No subgroup fairness audit or subgroup uncertainty is implemented yet.
+- Subgroup evidence is conditional on one holdout cohort and is not a regulatory
+  fairness assessment; intersectional and temporal evidence remain absent.
 - The real benchmark is one 2005 Taiwan credit-card cohort; transfer and temporal
   validity are not established.
 - LGD is assumed and statement balance is an exposure proxy, not observed loss.
@@ -33,9 +39,8 @@
 
 ## Next three priorities
 
-1. Add subgroup discrimination, calibration and threshold-error diagnostics with
-   uncertainty and explicit minimum-sample limitations.
-2. Add accessible missingness, segment and expected-loss portfolio diagnostics.
+1. Add accessible missingness, segment and expected-loss portfolio diagnostics.
+2. Add intersectional subgroup views only where sample support is sufficient.
 3. Reconcile only safe UI/documentation ideas from the older stack, then perform
    real screenshots, clean-install and deployment rehearsal.
 
