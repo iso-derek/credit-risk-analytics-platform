@@ -32,6 +32,11 @@ class ResearchTests(unittest.TestCase):
         all_rows=np.concatenate(list(self.parts.values()))
         self.assertEqual(len(np.unique(all_rows)),len(self.df))
         self.assertEqual(set(self.result['scored_data'].index),set(self.parts['test']))
+        expected=set(self.df.iloc[self.parts['test']].application_id)
+        self.assertEqual(set(self.result['scored_data'].application_id),expected)
+        self.assertTrue(expected.isdisjoint(set(self.df.iloc[self.parts['train']].application_id)))
+        self.assertTrue(expected.isdisjoint(set(self.df.iloc[self.parts['calibration']].application_id)))
+        self.assertTrue(expected.isdisjoint(set(self.df.iloc[self.parts['validation']].application_id)))
     def test_overlapping_partitions_rejected(self):
         broken={k:v.copy() for k,v in self.parts.items()}
         broken['test'][0]=broken['train'][0]
