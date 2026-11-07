@@ -1,7 +1,7 @@
 # Development status
 
 **Updated:** 7 November 2026
-**Phase:** Project B, milestone B4 — sample-aware intersectional diagnostics
+**Phase:** Project B, milestone B5 — reference-to-holdout drift contracts
 
 ## Completed through this branch
 
@@ -24,6 +24,8 @@
   concentration measures and explicit assumption limits.
 - Added optional two-field subgroup intersections under the existing minimum-size
   and two-outcome suppression contract.
+- Added fixed-reference PSI for predictors and scores, explicit unseen/missing
+  buckets, missing-rate deltas and non-production interpretation limits.
 
 ## Tests
 
@@ -44,9 +46,9 @@
 
 ## Next three priorities
 
-1. Add model and data drift monitoring contracts with reference-period limits.
-2. Reconcile only safe UI/documentation ideas from the older stack.
-3. Perform real screenshots, clean-install and deployment rehearsal.
+1. Reconcile only safe UI/documentation ideas from the older stack.
+2. Perform real screenshots, clean-install and deployment rehearsal.
+3. Define production monitoring ownership and timestamped cohort requirements.
    real screenshots, clean-install and deployment rehearsal.
 
 ## Remaining before stable release

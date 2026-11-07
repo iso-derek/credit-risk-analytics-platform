@@ -8,6 +8,7 @@ import streamlit as st
 from data_sources import synthetic_dataset, download_public_credit
 from analytics import concentration_summary, missingness_summary, segment_loss_summary
 from modelling import train_credit_models, model_feature_importance, applicant_sensitivity
+from monitoring import feature_drift_table, score_drift_summary
 from research import compare_selections, loss_scenarios, result_bundle
 from subgroup import add_audit_groups, add_intersection_group, available_group_columns, subgroup_diagnostics
 
@@ -34,7 +35,7 @@ with st.container(horizontal=True):
     st.metric('Mean predicted default risk',f'{df.probability_default.mean():.1%}',border=True)
     st.metric('Observed test defaults',f'{df.default.mean():.1%}',border=True)
     st.metric('Expected loss (assumed LGD)',f"{spec['currency']} {df.expected_loss.sum():,.0f}",border=True)
-overview,evidence,subgroups,applicant,scenarios,research=st.tabs(['Portfolio','Model evidence','Subgroup diagnostics','Applicant sensitivity','Loss scenarios','Research exports'])
+overview,evidence,monitoring,subgroups,applicant,scenarios,research=st.tabs(['Portfolio','Model evidence','Drift monitoring','Subgroup diagnostics','Applicant sensitivity','Loss scenarios','Research exports'])
 with overview:
     st.subheader('Probability distribution')
     st.plotly_chart(px.histogram(df,x='probability_default',color='credit_score_band',nbins=30),width='stretch',alt='Held-out applicant default probabilities by credit score band')
@@ -76,6 +77,30 @@ with evidence:
     st.plotly_chart(fig,width='stretch',alt='Predicted and observed default rates across probability bins')
     st.caption('The dashed line represents matching predicted and observed rates. Brier score and log loss measure more than calibration alone.')
     if st.button('Compute validation permutation importance'): st.dataframe(model_feature_importance(result),alt='Validation permutation importance by model feature')
+with monitoring:
+    st.subheader('Reference-to-holdout drift signals')
+    st.warning('This is a same-cohort development diagnostic, not production or temporal monitoring. The random training split is the reference and the untouched final-test split is current; thresholds are descriptive heuristics, not automatic model actions.')
+    drift=feature_drift_table(result['reference_X'],df,spec['numeric'],spec['categorical'])
+    score_drift=score_drift_summary(result['reference_scores'],df.probability_default)
+    with st.container(horizontal=True):
+        st.metric('Score PSI',f"{score_drift['psi']:.3f}",border=True)
+        st.metric('Mean PD change',f"{score_drift['mean_pd_change']:+.1%}",border=True)
+        st.metric('Higher feature signals',f"{(drift.shift_signal=='Higher shift signal').sum():,}",border=True)
+        st.metric('Features reviewed',f'{len(drift):,}',border=True)
+    st.caption(f"Score-distribution signal: {score_drift['shift_signal']}. PSI bins are fixed from the training reference; unseen categories and missing values receive explicit buckets.")
+    st.bar_chart(drift.head(10),x='feature',y='psi',color='feature_type',y_label='Population Stability Index',alt='Largest predictor distribution shift signals between training reference and final test')
+    st.dataframe(
+        drift,
+        hide_index=True,
+        alt='Predictor drift and missingness changes from training reference to final test',
+        column_config={
+            'reference_missing_rate':st.column_config.NumberColumn(format='percent'),
+            'current_missing_rate':st.column_config.NumberColumn(format='percent'),
+            'missing_rate_change':st.column_config.NumberColumn(format='percent'),
+        },
+    )
+    st.caption('PSI below 0.10, 0.10–0.25 and above 0.25 is labelled lower, moderate and higher signal for triage only. PSI does not diagnose cause, impact, fairness, calibration decay or outcome performance.')
+    st.download_button('Download drift diagnostics',drift.to_csv(index=False),'credit_drift_diagnostics.csv','text/csv')
 with subgroups:
     st.subheader('Held-out subgroup diagnostics')
     st.warning('Diagnostic evidence only — not a regulatory fairness assessment or lending-policy approval. Group fields are excluded from the UCI model inputs, but exclusion alone does not establish fairness.')

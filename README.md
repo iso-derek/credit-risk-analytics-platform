@@ -33,6 +33,8 @@ Lenders and fintech teams need to evaluate applicant risk, estimate probability 
   with bootstrap uncertainty, optional intersections and minimum-sample suppression
 - Raw held-out missingness plus reconciling segment exposure, expected-loss shares
   and descriptive concentration measures
+- Fixed-reference predictor and score PSI with missing/unseen buckets and explicit
+  same-cohort, non-production monitoring limits
 - Feature importance explanation
 - Streamlit dashboard for applicant and portfolio risk
 
@@ -163,6 +165,8 @@ See [subgroup diagnostics](docs/SUBGROUP_DIAGNOSTICS.md) for metric definitions,
 suppression rules and the limits of fairness interpretation.
 See [portfolio diagnostics](docs/PORTFOLIO_DIAGNOSTICS.md) for coverage timing,
 reconciliation and concentration assumptions.
+See [drift monitoring](docs/DRIFT_MONITORING.md) for reference-bin mechanics and
+production-monitoring limitations.
 The public adapter preserves Taiwan-dollar units and uses statement balance as an
 exposure proxy; it does not invent income or FICO values. Raw public data is fetched
 from UCI on request, not redistributed here.
