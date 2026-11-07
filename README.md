@@ -170,6 +170,8 @@ See [subgroup diagnostics](docs/SUBGROUP_DIAGNOSTICS.md) for metric definitions,
 suppression rules and the limits of fairness interpretation.
 See [portfolio diagnostics](docs/PORTFOLIO_DIAGNOSTICS.md) for coverage timing,
 reconciliation and concentration assumptions.
+See the [security policy](SECURITY.md) and [security review](docs/SECURITY_REVIEW.md)
+for the bounded public-data download, dependency controls and deployment boundary.
 See [drift monitoring](docs/DRIFT_MONITORING.md) for reference-bin mechanics and
 production-monitoring limitations.
 The public adapter preserves Taiwan-dollar units and uses statement balance as an

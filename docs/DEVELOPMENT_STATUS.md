@@ -1,7 +1,7 @@
 # Development status
 
-**Updated:** 7 November 2026
-**Phase:** Project B, milestone B6 — release acceptance rehearsal
+**Updated:** 8 November 2026
+**Phase:** Project B, milestone B7 — security and dependency hardening
 
 ## Completed through this branch
 
@@ -13,7 +13,7 @@
   evaluation and portfolio scoring.
 - Added explicit applicant-ID regression checks proving the reported portfolio is
   exactly the final test set and excludes train, calibration and validation IDs.
-- Pinned all eight direct dependencies used by compatibility CI.
+- Pinned the direct dependencies used by compatibility and security CI.
 - Added final-test-only subgroup discrimination, calibration and threshold-error
   diagnostics with deterministic applicant-bootstrap uncertainty.
 - Added explicit suppression for small groups and groups with only one observed
@@ -30,10 +30,16 @@
   loopback health check and readiness-gated Chromium screenshots.
 - Added native financial-dashboard theming and analyst-facing chart labels without
   custom CSS.
+- Added bounded HTTPS streaming for the public benchmark, automated vulnerability
+  auditing, Dependabot coverage and security/data-boundary documentation.
+- Upgraded Streamlit to 1.67 and constrained Pillow 13 after the initial audit found
+  published Pillow 12.3 advisories.
 
 ## Tests and acceptance
 
-- Fresh launcher-created Python 3.12 environment: 26 tests passed.
+- Fresh project environment: 31 tests passed on Python 3.13.
+- Strict dependency audit reported no known vulnerabilities after the constrained
+  Streamlit and Pillow upgrade.
 - Python compilation passed and `pip check` reported no broken requirements.
 - Tests cover final-test isolation, subgroup suppression and uncertainty, portfolio
   reconciliation, drift bins, exports, launcher provenance and Streamlit controls.
@@ -61,4 +67,4 @@
 - Independent review of subgroup/fairness evidence without regulatory-compliance claims.
 - External or temporal validation, or tightly constrained transfer claims.
 - Private-host deployment rehearsal and operating-owner acceptance.
-- Security/dependency review and explicit approval before merge or deployment.
+- Explicit approval remains required before any public or private deployment.

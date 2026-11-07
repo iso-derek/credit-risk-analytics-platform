@@ -10,6 +10,7 @@ from preprocessing import NUMERIC_FEATURES, CATEGORICAL_FEATURES, engineer_featu
 UCI_URL = 'https://archive.ics.uci.edu/static/public/350/data.csv'
 UCI_CITATION = 'Yeh, I. (2009). Default of Credit Card Clients. UCI. DOI:10.24432/C55S3H (CC BY 4.0).'
 UCI_NAMES = ['LIMIT_BAL','SEX','EDUCATION','MARRIAGE','AGE','PAY_0','PAY_2','PAY_3','PAY_4','PAY_5','PAY_6'] + [f'BILL_AMT{i}' for i in range(1,7)] + [f'PAY_AMT{i}' for i in range(1,7)]
+MAX_DOWNLOAD_BYTES = 15_000_000
 
 
 def validate_dataset(df, features, exposure):
@@ -58,10 +59,28 @@ def public_credit_dataset(raw):
     return df,spec
 
 
+def _download_bounded(url=UCI_URL,max_bytes=MAX_DOWNLOAD_BYTES):
+    if not url.startswith('https://'): raise ValueError('Public dataset URL must use HTTPS.')
+    response=requests.get(url,timeout=(5,30),stream=True)
+    try:
+        response.raise_for_status()
+        length=response.headers.get('Content-Length')
+        try: declared_size=int(length) if length is not None else None
+        except (TypeError,ValueError): declared_size=None
+        if declared_size is not None and declared_size>max_bytes: raise ValueError('Unexpectedly large credit dataset.')
+        chunks=[];size=0
+        for chunk in response.iter_content(chunk_size=64_000):
+            if not chunk: continue
+            size+=len(chunk)
+            if size>max_bytes: raise ValueError('Unexpectedly large credit dataset.')
+            chunks.append(chunk)
+        return b''.join(chunks)
+    finally:
+        response.close()
+
+
 def download_public_credit():
-    response=requests.get(UCI_URL,timeout=30)
-    response.raise_for_status()
-    if len(response.content)>15_000_000: raise ValueError('Unexpectedly large credit dataset.')
-    df,spec=public_credit_dataset(pd.read_csv(BytesIO(response.content)))
-    spec['source_sha256']=hashlib.sha256(response.content).hexdigest()
+    content=_download_bounded()
+    df,spec=public_credit_dataset(pd.read_csv(BytesIO(content)))
+    spec['source_sha256']=hashlib.sha256(content).hexdigest()
     return df,spec

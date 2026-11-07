@@ -1,0 +1,26 @@
+name: Dependency security
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+      - name: Install auditor
+        run: python -m pip install pip-audit==2.10.1
+      - name: Audit tested dependency target
+        run: python -m pip_audit -r requirements-tested.txt --strict

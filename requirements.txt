@@ -1,7 +1,8 @@
 pandas
 numpy
 scikit-learn
-streamlit
+streamlit>=1.67,<1.68
 plotly
 python-dateutil
 requests>=2.31
+pillow>=13,<14
