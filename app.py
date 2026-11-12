@@ -11,6 +11,7 @@ from modelling import train_credit_models, model_feature_importance, applicant_s
 from monitoring import feature_drift_table, score_drift_summary
 from research import compare_selections, loss_scenarios, result_bundle
 from subgroup import add_audit_groups, add_intersection_group, available_group_columns, subgroup_diagnostics
+from table_labels import readable, table_config
 
 st.set_page_config(page_title='Credit Risk Research',layout='wide')
 st.title('Credit Risk Analytics & Research')
@@ -44,7 +45,11 @@ with overview:
     )
     probability_chart.update_layout(legend_title_text='Credit score band',yaxis_title_text='Applicants')
     st.plotly_chart(probability_chart,width='stretch',alt='Held-out applicant default probabilities by credit score band')
-    st.dataframe(df[['application_id','credit_score_band','probability_default','ead','expected_loss']],hide_index=True,alt='Held-out applicant probability and expected-loss details')
+    applicants=df[['application_id','credit_score_band','probability_default','ead','expected_loss']]
+    st.dataframe(applicants,hide_index=True,alt='Held-out applicant probability and expected-loss details',
+                 column_config=table_config(applicants,{'probability_default':st.column_config.NumberColumn('Default probability',format='percent'),
+                                                        'ead':st.column_config.NumberColumn(f"Exposure at default ({spec['currency']})",format='accounting'),
+                                                        'expected_loss':st.column_config.NumberColumn(f"Expected loss ({spec['currency']})",format='accounting')}))
     st.subheader('Held-out data coverage')
     coverage=missingness_summary(df,spec['numeric']+spec['categorical'])
     missing_cells=int(coverage.missing_applicants.sum())
@@ -56,7 +61,8 @@ with overview:
         coverage,
         hide_index=True,
         alt='Missing-value coverage for held-out model input fields',
-        column_config={'missing_rate':st.column_config.NumberColumn('Missing rate',format='percent')},
+        column_config=table_config(coverage,{'missing_rate':st.column_config.NumberColumn('Missing rate',format='percent'),
+                                             'missing_applicants':st.column_config.NumberColumn('Missing applicants',format='localized')}),
     )
     st.caption('Coverage is measured on raw held-out fields before the fitted preprocessing pipeline imputes missing values. Complete coverage does not establish data accuracy or representativeness.')
     st.subheader('Segment exposure and expected loss')
@@ -68,20 +74,29 @@ with overview:
         st.metric('Largest exposure share',f"{concentration['largest_exposure_share']:.1%}",border=True)
         st.metric('Largest expected-loss share',f"{concentration['largest_expected_loss_share']:.1%}",border=True)
         st.metric('Expected-loss HHI',f"{concentration['expected_loss_hhi']:.3f}",border=True)
-    st.bar_chart(segment_table,x='segment',y='expected_loss_share',y_label='Expected-loss share',alt='Expected-loss share across the selected held-out portfolio segments')
+    st.bar_chart(segment_table,x='segment',y='expected_loss_share',x_label=readable(segment_column),y_label='Expected-loss share',alt='Expected-loss share across the selected held-out portfolio segments')
     segment_formats={column:st.column_config.NumberColumn(format='percent') for column in ['mean_predicted_pd','observed_default_rate','applicant_share','exposure_share','expected_loss_share'] if column in segment_table}
-    st.dataframe(segment_table,hide_index=True,alt='Exposure, default risk and expected loss by selected portfolio segment',column_config=segment_formats)
+    st.dataframe(segment_table,hide_index=True,alt='Exposure, default risk and expected loss by selected portfolio segment',
+                 column_config=table_config(segment_table,{**segment_formats,'segment':st.column_config.Column(readable(segment_column))}))
     st.caption('Concentration is descriptive, conditional on assumed 45% LGD and the exposure proxy. HHI ranges from near zero for diffuse shares to one for a single segment; no policy limit is implied.')
 with evidence:
     st.write('Probability model selected using validation log loss:',result['best_model_name'])
     st.caption('55% training → 15% calibration → 15% model selection → 15% final testing. Final test results do not choose the model.')
     table=pd.DataFrame({name:{k:v for k,v in m.items() if k in ['roc_auc','pr_auc','brier','log_loss','loss_proxy_error']} for name,m in result['models'].items()}).T
-    st.dataframe(table,alt='Final-test metrics for each fitted probability model')
-    fig=px.scatter(result['reliability'],x='predicted_pd',y='observed_default_rate',size='applicants',hover_data=['bin'])
+    st.dataframe(table,alt='Final-test metrics for each fitted probability model',
+                 column_config=table_config(table,{'brier':st.column_config.NumberColumn('Brier score',format='%.4f'),
+                                                   'log_loss':st.column_config.NumberColumn('Log loss',format='%.4f'),
+                                                   'roc_auc':st.column_config.NumberColumn('ROC AUC',format='%.3f'),
+                                                   'pr_auc':st.column_config.NumberColumn('PR AUC',format='%.3f')},index_label='Model'))
+    fig=px.scatter(result['reliability'],x='predicted_pd',y='observed_default_rate',size='applicants',hover_data=['bin'],
+                   labels={'predicted_pd':'Mean predicted default probability','observed_default_rate':'Observed default rate','applicants':'Applicants','bin':'Probability bin'})
+    fig.update_layout(xaxis_tickformat='.0%',yaxis_tickformat='.0%')
     fig.add_shape(type='line',x0=0,y0=0,x1=1,y1=1,line={'dash':'dash'})
     st.plotly_chart(fig,width='stretch',alt='Predicted and observed default rates across probability bins')
     st.caption('The dashed line represents matching predicted and observed rates. Brier score and log loss measure more than calibration alone.')
-    if st.button('Compute validation permutation importance'): st.dataframe(model_feature_importance(result),alt='Validation permutation importance by model feature')
+    if st.button('Compute validation permutation importance'):
+        importance=model_feature_importance(result)
+        st.dataframe(importance,alt='Validation permutation importance by model feature',column_config=table_config(importance))
 with monitoring:
     st.subheader('Reference-to-holdout drift signals')
     st.warning('This is a same-cohort development diagnostic, not production or temporal monitoring. The random training split is the reference and the untouched final-test split is current; thresholds are descriptive heuristics, not automatic model actions.')
@@ -100,11 +115,12 @@ with monitoring:
         drift,
         hide_index=True,
         alt='Predictor drift and missingness changes from training reference to final test',
-        column_config={
+        column_config=table_config(drift,{
             'reference_missing_rate':st.column_config.NumberColumn(format='percent'),
             'current_missing_rate':st.column_config.NumberColumn(format='percent'),
             'missing_rate_change':st.column_config.NumberColumn(format='percent'),
-        },
+            'psi':st.column_config.NumberColumn('PSI',format='%.3f'),
+        }),
     )
     st.caption('PSI below 0.10, 0.10–0.25 and above 0.25 is labelled lower, moderate and higher signal for triage only. PSI does not diagnose cause, impact, fairness, calibration decay or outcome performance.')
     st.download_button('Download drift diagnostics',drift.to_csv(index=False),'credit_drift_diagnostics.csv','text/csv')
@@ -135,18 +151,18 @@ with subgroups:
             st.metric('Groups suppressed',f'{len(audit)-len(reported):,}',border=True)
             st.metric('Decision threshold',f'{threshold:.0%}',border=True)
         if not reported.empty:
-            chart=reported[['group','mean_predicted_pd','observed_default_rate']].melt('group',var_name='measure',value_name='rate')
-            st.bar_chart(chart,x='group',y='rate',color='measure',y_label='Rate',alt='Mean predicted and observed default rates by reported subgroup')
+            chart=reported[['group','mean_predicted_pd','observed_default_rate']].rename(columns={'mean_predicted_pd':'Mean predicted PD','observed_default_rate':'Observed default rate'}).melt('group',var_name='Measure',value_name='rate')
+            st.bar_chart(chart,x='group',y='rate',color='Measure',x_label='Group',y_label='Rate',alt='Mean predicted and observed default rates by reported subgroup')
         st.dataframe(
             audit,
             hide_index=True,
             alt='Held-out subgroup calibration, discrimination and threshold-error diagnostics',
-            column_config={
+            column_config=table_config(audit,{
                 column:st.column_config.NumberColumn(format='percent') for column in [
                     'mean_predicted_pd','observed_default_rate','observed_rate_ci_low','observed_rate_ci_high',
                     'calibration_gap','calibration_gap_ci_low','calibration_gap_ci_high','brier_score',
                     'roc_auc','flag_rate','true_positive_rate','false_positive_rate','precision']
-            },
+            }),
         )
         st.caption('Intervals are 95% applicant-level bootstrap intervals conditional on the fitted model and this final-test cohort. Groups below the minimum size or with one observed outcome are suppressed; results do not establish transfer, causal or legal fairness.')
         st.download_button('Download subgroup diagnostics',audit.to_csv(index=False),f'credit_subgroup_{audit_group_column}.csv','text/csv')
@@ -154,7 +170,8 @@ with applicant:
     choice=st.selectbox('Held-out applicant',df.application_id.tolist())
     row=df[df.application_id==choice].iloc[0]
     st.metric('Predicted default probability',f'{row.probability_default:.1%}')
-    st.dataframe(applicant_sensitivity(result,row).head(10),hide_index=True,alt='Top model sensitivity changes for the selected held-out applicant')
+    sensitivity=applicant_sensitivity(result,row).head(10)
+    st.dataframe(sensitivity,hide_index=True,alt='Top model sensitivity changes for the selected held-out applicant',column_config=table_config(sensitivity))
     st.caption('PD change replaces one input with its training reference. Correlated inputs can make replacements unrealistic. This is model sensitivity, not a causal explanation or lending recommendation.')
 with scenarios:
     odds=st.slider('Default odds multiplier (assumed)',.25,4.,1.,.25,key='scenario_odds')
