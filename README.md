@@ -178,6 +178,8 @@ See the [monitoring runbook](docs/MONITORING_RUNBOOK.md) for timestamped cohort,
 delayed-outcome, alert-ownership and evidence-retention requirements.
 See the [private deployment rehearsal](docs/DEPLOYMENT_REHEARSAL.md) for the non-root
 container, health check and approval boundary.
+See the [model card](docs/MODEL_CARD.md) and run `python scripts/release_readiness.py`
+for intended-use limits and the machine-checkable stable-release blockers.
 The public adapter preserves Taiwan-dollar units and uses statement balance as an
 exposure proxy; it does not invent income or FICO values. Raw public data is fetched
 from UCI on request, not redistributed here.

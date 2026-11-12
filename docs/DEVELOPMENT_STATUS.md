@@ -1,7 +1,7 @@
 # Development status
 
 **Updated:** 12 November 2026
-**Phase:** Project B, milestone B9 — portable deployment rehearsal
+**Phase:** Project B, milestone B10 — model governance and release gate
 
 ## Completed through this branch
 
@@ -38,10 +38,12 @@
   accounting, owned signal routing, a validation CLI and an operating runbook.
 - Added a non-root Python 3.13 release container, minimal build context, loopback
   health contract and CI build/start/health/cleanup smoke rehearsal.
+- Added an intended-use model card and machine-checkable release gate that verifies
+  repository evidence while preserving external validation and approval blockers.
 
 ## Tests and acceptance
 
-- Fresh project environment: 41 tests passed on Python 3.13.
+- Fresh project environment: 46 tests passed on Python 3.13.
 - Strict dependency audit reported no known vulnerabilities after the constrained
   Streamlit and Pillow upgrade.
 - Python compilation passed and `pip check` reported no broken requirements.
