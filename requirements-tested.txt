@@ -2,7 +2,7 @@
 # Transitive packages are resolved by pip; optional model backends are separate.
 numpy==2.2.6
 pandas==2.2.3
-scipy==1.15.3
+scipy==1.18.1
 scikit-learn==1.8.0
 streamlit==1.67.0
 plotly==7.1.0
