@@ -1,7 +1,7 @@
 # Development status
 
-**Updated:** 8 November 2026
-**Phase:** Project B, milestone B7 — security and dependency hardening
+**Updated:** 12 November 2026
+**Phase:** Project B, milestone B8 — operational monitoring readiness
 
 ## Completed through this branch
 
@@ -34,15 +34,18 @@
   auditing, Dependabot coverage and security/data-boundary documentation.
 - Upgraded Streamlit to 1.67 and constrained Pillow 13 after the initial audit found
   published Pillow 12.3 advisories.
+- Added a machine-checkable timestamped-cohort boundary, delayed-outcome maturity
+  accounting, owned signal routing, a validation CLI and an operating runbook.
 
 ## Tests and acceptance
 
-- Fresh project environment: 31 tests passed on Python 3.13.
+- Fresh project environment: 37 tests passed on Python 3.13.
 - Strict dependency audit reported no known vulnerabilities after the constrained
   Streamlit and Pillow upgrade.
 - Python compilation passed and `pip check` reported no broken requirements.
 - Tests cover final-test isolation, subgroup suppression and uncertainty, portfolio
-  reconciliation, drift bins, exports, launcher provenance and Streamlit controls.
+  reconciliation, drift bins, timestamped cohort validation, delayed outcomes,
+  owned signal routing, exports, launcher provenance and Streamlit controls.
 - Readiness-gated Chromium captures verify the Portfolio, Drift monitoring and
   Subgroup diagnostics views after real rendering.
 
@@ -59,7 +62,7 @@
 ## Next three priorities
 
 1. Choose and approve a Python-compatible hosting target for a private demo rehearsal.
-2. Define production monitoring ownership and timestamped cohort requirements.
+2. Assign named people to the monitoring owner roles before a private rehearsal.
 3. Obtain external or temporal validation before broadening research claims.
 
 ## Remaining before stable release
