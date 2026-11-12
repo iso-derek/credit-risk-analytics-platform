@@ -20,3 +20,7 @@ Those common heuristic bands are not pass/fail limits and do not trigger model a
   fairness, loss accuracy or lending suitability.
 - A production implementation needs timestamped cohorts, delayed-outcome handling,
   data-quality service levels, alert ownership and documented response procedures.
+
+The operational contract, validator and role-based response process are defined in
+[the monitoring runbook](MONITORING_RUNBOOK.md). They are readiness controls only;
+no live monitoring job or private-data integration has been created.

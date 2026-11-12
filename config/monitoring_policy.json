@@ -1,0 +1,18 @@
+{
+  "policy_version": "1.0",
+  "minimum_cohort_rows": 200,
+  "outcome_lag_days": 60,
+  "thresholds": {
+    "moderate_psi": 0.10,
+    "high_psi": 0.25,
+    "missing_rate_change": 0.05
+  },
+  "owners": {
+    "model_risk": "Model Risk Owner",
+    "data_quality": "Data Quality Owner",
+    "engineering": "Platform Engineering Owner"
+  },
+  "review_cadence": "monthly",
+  "evidence_retention_months": 24,
+  "automatic_model_action": false
+}
