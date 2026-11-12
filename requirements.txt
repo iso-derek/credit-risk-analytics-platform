@@ -6,3 +6,5 @@ plotly
 python-dateutil
 requests>=2.31
 pillow>=13,<14
+fastapi>=0.162,<1
+uvicorn>=0.30

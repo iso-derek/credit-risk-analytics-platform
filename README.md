@@ -92,6 +92,31 @@ python scripts/run_research.py
 streamlit run app.py
 ```
 
+## Credit Risk Studio web app (preview)
+
+A React web app with a FastAPI backend that reuses the same tested analysis code in `src/`.
+It has five screens: Portfolio, Applicants (with a profile per person), What-if scenarios,
+Model quality and Fairness check. Every field is shown with a plain-English name and format.
+
+Requires Python 3.12+ and Node.js 20+.
+
+```bash
+pip install -r requirements.txt
+cd web && npm install && npm run build && cd ..
+python -m uvicorn api.main:app --port 8000
+```
+
+Open http://localhost:8000. FastAPI serves both the app and its API (`/api/...`).
+
+For development with instant reloads, run the API and the React dev server side by side:
+
+```bash
+python -m uvicorn api.main:app --reload --port 8000
+cd web && npm run dev
+```
+
+Then open http://localhost:5173. The Streamlit dashboard above still works unchanged.
+
 ## Dashboard screenshots
 
 ### Held-out portfolio
