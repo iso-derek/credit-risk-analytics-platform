@@ -1,0 +1,37 @@
+name: Container smoke test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build release image
+        run: docker build --tag credit-risk-app:ci .
+      - name: Start non-root container
+        run: docker run --detach --name credit-risk-app --publish 8502:8502 credit-risk-app:ci
+      - name: Verify runtime user and health
+        run: |
+          test "$(docker exec credit-risk-app id -u)" != "0"
+          for attempt in {1..30}; do
+            if curl --fail --silent --show-error http://127.0.0.1:8502/_stcore/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs credit-risk-app
+          exit 1
+      - name: Capture container logs
+        if: always()
+        run: docker logs credit-risk-app || true
+      - name: Stop container
+        if: always()
+        run: docker rm --force credit-risk-app || true

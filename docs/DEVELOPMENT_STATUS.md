@@ -1,7 +1,7 @@
 # Development status
 
 **Updated:** 12 November 2026
-**Phase:** Project B, milestone B8 — operational monitoring readiness
+**Phase:** Project B, milestone B9 — portable deployment rehearsal
 
 ## Completed through this branch
 
@@ -36,10 +36,12 @@
   published Pillow 12.3 advisories.
 - Added a machine-checkable timestamped-cohort boundary, delayed-outcome maturity
   accounting, owned signal routing, a validation CLI and an operating runbook.
+- Added a non-root Python 3.13 release container, minimal build context, loopback
+  health contract and CI build/start/health/cleanup smoke rehearsal.
 
 ## Tests and acceptance
 
-- Fresh project environment: 37 tests passed on Python 3.13.
+- Fresh project environment: 41 tests passed on Python 3.13.
 - Strict dependency audit reported no known vulnerabilities after the constrained
   Streamlit and Pillow upgrade.
 - Python compilation passed and `pip check` reported no broken requirements.
@@ -56,12 +58,12 @@
 - The real benchmark is one 2005 Taiwan credit-card cohort; transfer and temporal
   validity are not established.
 - LGD is assumed and statement balance is an exposure proxy, not observed loss.
-- No public deployment or private-host rehearsal has been approved. Older PRs #9–16
-  must not be bulk-merged.
+- No public deployment or hosted private rehearsal has been approved. The portable
+  container rehearsal is CI-only. Older PRs #9–16 must not be bulk-merged.
 
 ## Next three priorities
 
-1. Choose and approve a Python-compatible hosting target for a private demo rehearsal.
+1. Choose and approve an access-controlled container host for a private demo rehearsal.
 2. Assign named people to the monitoring owner roles before a private rehearsal.
 3. Obtain external or temporal validation before broadening research claims.
 
@@ -69,5 +71,5 @@
 
 - Independent review of subgroup/fairness evidence without regulatory-compliance claims.
 - External or temporal validation, or tightly constrained transfer claims.
-- Private-host deployment rehearsal and operating-owner acceptance.
+- Hosted private deployment rehearsal and operating-owner acceptance.
 - Explicit approval remains required before any public or private deployment.
