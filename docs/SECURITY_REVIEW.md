@@ -46,3 +46,7 @@ than silently presenting the first scan as clean.
 Before any hosted demo, select a Python-compatible host, restrict the app to synthetic
 or approved public data, review access/logging/retention, define an operating owner,
 and rerun dependency and compatibility checks from the release commit.
+
+The release container runs as a non-root user, copies no local data or evidence
+folders, and is smoke-tested through the loopback Streamlit health endpoint. TLS,
+authentication, network policy and secret management remain host responsibilities.

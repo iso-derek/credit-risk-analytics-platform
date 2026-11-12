@@ -1,0 +1,14 @@
+.git
+.github
+.venv
+__pycache__
+*.pyc
+.env
+runs
+outputs
+screenshots
+tests
+docs
+data
+*.zip
+*.pkl
