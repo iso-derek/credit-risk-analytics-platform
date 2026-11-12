@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "release_name": "stable research demonstration",
+  "criteria": [
+    {
+      "id": "research_protocol",
+      "category": "model evidence",
+      "description": "Leakage-resistant selection and final-test protocol is documented and tested.",
+      "owner_role": "Model Risk Owner",
+      "state": "complete",
+      "evidence_path": "docs/RESEARCH_PROTOCOL.md"
+    },
+    {
+      "id": "security_review",
+      "category": "security",
+      "description": "Dependency, download and application attack-surface controls are reviewed.",
+      "owner_role": "Platform Engineering Owner",
+      "state": "complete",
+      "evidence_path": "docs/SECURITY_REVIEW.md"
+    },
+    {
+      "id": "monitoring_contract",
+      "category": "operations",
+      "description": "Timestamped cohorts, delayed outcomes and signal ownership are specified.",
+      "owner_role": "Model Risk Owner",
+      "state": "complete",
+      "evidence_path": "docs/MONITORING_RUNBOOK.md"
+    },
+    {
+      "id": "container_rehearsal",
+      "category": "operations",
+      "description": "A non-root release container is built and health-smoked in CI.",
+      "owner_role": "Platform Engineering Owner",
+      "state": "complete",
+      "evidence_path": "docs/DEPLOYMENT_REHEARSAL.md"
+    },
+    {
+      "id": "external_or_temporal_validation",
+      "category": "model evidence",
+      "description": "Independent external or genuinely out-of-time evidence is accepted.",
+      "owner_role": "Model Risk Owner",
+      "state": "blocked",
+      "blocker": "No approved external or timestamped outcome dataset is available."
+    },
+    {
+      "id": "named_operating_owners",
+      "category": "operations",
+      "description": "Named people accept model-risk, data-quality and engineering duties.",
+      "owner_role": "Business Sponsor",
+      "state": "blocked",
+      "blocker": "Repository roles have not been assigned to named people."
+    },
+    {
+      "id": "access_controlled_host_rehearsal",
+      "category": "deployment",
+      "description": "The exact release commit is rehearsed on an approved private host.",
+      "owner_role": "Platform Engineering Owner",
+      "state": "blocked",
+      "blocker": "No access-controlled hosting target has been selected or approved."
+    },
+    {
+      "id": "privacy_access_retention_approval",
+      "category": "deployment",
+      "description": "Privacy, authentication, logging and retention decisions are approved.",
+      "owner_role": "Business Sponsor",
+      "state": "blocked",
+      "blocker": "No hosted-data or access-control review has been approved."
+    }
+  ]
+}
