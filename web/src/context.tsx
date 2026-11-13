@@ -13,9 +13,10 @@ const DatasetContext = createContext<DatasetState | null>(null);
 
 function initialDataset(): Dataset {
   try {
-    return localStorage.getItem("credit-dataset") === "uci" ? "uci" : "synthetic";
+    const saved = localStorage.getItem("credit-dataset");
+    return saved === "synthetic" || saved === "german" ? saved : "uci"; // real data by default
   } catch {
-    return "synthetic";
+    return "uci";
   }
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export type Dataset = "synthetic" | "uci";
+export type Dataset = "synthetic" | "uci" | "german";
 
 export interface Field {
   key: string;
@@ -17,6 +17,9 @@ export interface Band {
 export interface Meta {
   dataset: Dataset;
   synthetic: boolean;
+  name: string;
+  source_url: string | null;
+  protected_fields: string[];
   source: string;
   currency: string;
   outcome: string;

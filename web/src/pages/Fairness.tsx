@@ -26,7 +26,7 @@ interface FairnessData {
 }
 
 export default function Fairness() {
-  const { dataset } = useDataset();
+  const { dataset, meta } = useDataset();
   const [group, setGroup] = useState("");
   const [second, setSecond] = useState("");
   const [threshold, setThreshold] = useState(0.2);
@@ -52,8 +52,9 @@ export default function Fairness() {
         rates, and how often each group would be flagged.
       </PageHead>
       <Notice tone="warn">
-        A diagnostic, not a legal fairness assessment. Group fields are not model inputs for the public dataset, but leaving them out
-        does not by itself make a model fair.
+        A diagnostic, not a legal fairness assessment.{" "}
+        {meta && meta.protected_fields.length > 0 && <>{meta.protected_fields.join(", ")} {meta.protected_fields.length > 1 ? "are" : "is"} deliberately not used by the model, </>}
+        but leaving them out does not by itself make a model fair.
       </Notice>
 
       {error ? <div className="section"><ErrorState message={error} /></div> : !data ? <div className="section"><Skeleton height={400} /></div> : data.options.length === 0 ? (

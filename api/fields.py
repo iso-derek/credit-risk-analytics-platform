@@ -44,6 +44,27 @@ FIELDS: dict[str, dict[str, str]] = {
     "MARRIAGE": {"label": "Marital status (dataset code)", "kind": "text"},
     "AGE": {"label": "Age", "kind": "years"},
     "exposure_proxy": {"label": "Exposure", "kind": "money"},
+    # Statlog German Credit (amounts in Deutsche Mark).
+    "checking_account": {"label": "Checking account balance", "kind": "text"},
+    "duration_months": {"label": "Loan length", "kind": "months"},
+    "credit_history": {"label": "Credit history", "kind": "text"},
+    "purpose": {"label": "Loan purpose", "kind": "text"},
+    "credit_amount": {"label": "Credit amount", "kind": "money"},
+    "savings": {"label": "Savings", "kind": "text"},
+    "employment_since": {"label": "Time in current job", "kind": "text"},
+    "installment_rate": {"label": "Repayments as share of income (1–4 scale)", "kind": "integer",
+                         "help": "1 = lowest burden, 4 = highest."},
+    "other_debtors": {"label": "Co-applicant or guarantor", "kind": "text"},
+    "residence_years": {"label": "Years at current address (1–4 scale)", "kind": "integer"},
+    "property": {"label": "Most valuable property", "kind": "text"},
+    "other_installment_plans": {"label": "Other repayment plans", "kind": "text"},
+    "housing": {"label": "Housing", "kind": "text"},
+    "existing_credits": {"label": "Existing loans at this bank", "kind": "integer"},
+    "job": {"label": "Job", "kind": "text"},
+    "dependants": {"label": "People financially dependent", "kind": "integer"},
+    "telephone": {"label": "Registered telephone", "kind": "text"},
+    "foreign_worker": {"label": "Foreign worker", "kind": "text"},
+    "sex": {"label": "Sex", "kind": "text"},
 }
 _MONTHS = ["September", "August", "July", "June", "May", "April"]
 for _i, _month in enumerate(_MONTHS, start=1):

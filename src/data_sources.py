@@ -84,3 +84,65 @@ def download_public_credit():
     df,spec=public_credit_dataset(pd.read_csv(BytesIO(content)))
     spec['source_sha256']=hashlib.sha256(content).hexdigest()
     return df,spec
+
+# ---------------------------------------------------------------- Statlog German Credit (UCI 144, CC BY 4.0)
+GERMAN_URL = 'https://archive.ics.uci.edu/static/public/144/statlog+german+credit+data.zip'
+GERMAN_CITATION = 'Hofmann, H. (1994). Statlog (German Credit Data). UCI Machine Learning Repository. DOI:10.24432/C5NC77 (CC BY 4.0).'
+GERMAN_COLUMNS = ['checking_account', 'duration_months', 'credit_history', 'purpose', 'credit_amount', 'savings',
+                  'employment_since', 'installment_rate', 'personal_status_sex', 'other_debtors', 'residence_years',
+                  'property', 'age', 'other_installment_plans', 'housing', 'existing_credits', 'job', 'dependants',
+                  'telephone', 'foreign_worker', 'class']
+GERMAN_CODES = {
+    'A11': 'Overdrawn (below 0 DM)', 'A12': '0–200 DM', 'A13': '200 DM or more', 'A14': 'No checking account',
+    'A30': 'No credit taken or all repaid', 'A31': 'All credit at this bank repaid', 'A32': 'Existing credit repaid on time so far',
+    'A33': 'Late payments in the past', 'A34': 'Critical account or credit elsewhere',
+    'A40': 'New car', 'A41': 'Used car', 'A42': 'Furniture or equipment', 'A43': 'Radio or television', 'A44': 'Domestic appliances',
+    'A45': 'Repairs', 'A46': 'Education', 'A47': 'Vacation', 'A48': 'Retraining', 'A49': 'Business', 'A410': 'Other',
+    'A61': 'Under 100 DM', 'A62': '100–500 DM', 'A63': '500–1,000 DM', 'A64': '1,000 DM or more', 'A65': 'None or unknown',
+    'A71': 'Unemployed', 'A72': 'Under 1 year', 'A73': '1–4 years', 'A74': '4–7 years', 'A75': '7 years or more',
+    'A91': 'Male · divorced or separated', 'A92': 'Female · divorced, separated or married', 'A93': 'Male · single',
+    'A94': 'Male · married or widowed', 'A95': 'Female · single',
+    'A101': 'None', 'A102': 'Co-applicant', 'A103': 'Guarantor',
+    'A121': 'Real estate', 'A122': 'Savings agreement or life insurance', 'A123': 'Car or other', 'A124': 'None or unknown',
+    'A141': 'Bank', 'A142': 'Stores', 'A143': 'None', 'A151': 'Rents', 'A152': 'Owns', 'A153': 'Lives for free',
+    'A171': 'Unemployed or unskilled (non-resident)', 'A172': 'Unskilled (resident)', 'A173': 'Skilled employee or official',
+    'A174': 'Management, self-employed or highly qualified',
+    'A191': 'No', 'A192': 'Yes', 'A201': 'Yes', 'A202': 'No',
+}
+GERMAN_NUMERIC = ['duration_months', 'credit_amount', 'installment_rate', 'residence_years', 'existing_credits', 'dependants']
+# Sex, age and foreign-worker status are protected characteristics in lending: they are kept only for the
+# subgroup (fairness) diagnostics and are never model inputs.
+GERMAN_CATEGORICAL = ['checking_account', 'credit_history', 'purpose', 'savings', 'employment_since', 'other_debtors',
+                      'property', 'other_installment_plans', 'housing', 'job', 'telephone']
+
+
+def german_credit_dataset(raw_text: str):
+    rows = [line.split() for line in raw_text.strip().splitlines()]
+    df = pd.DataFrame(rows, columns=GERMAN_COLUMNS)
+    for column in GERMAN_NUMERIC + ['age', 'class']:
+        df[column] = pd.to_numeric(df[column], errors='raise')
+    for column in set(GERMAN_COLUMNS) - set(GERMAN_NUMERIC) - {'age', 'class'}:
+        unknown = set(df[column]) - set(GERMAN_CODES)
+        if unknown: raise ValueError(f'Unknown German Credit codes in {column}: {sorted(unknown)}')
+        df[column] = df[column].map(GERMAN_CODES)
+    df['sex'] = df.personal_status_sex.str.split(' · ').str[0]
+    df['default'] = (df['class'] == 2).astype(int)  # 1 = good, 2 = bad credit risk
+    df['application_id'] = [f'DE-{i:04d}' for i in range(1, len(df) + 1)]
+    spec = {'numeric': GERMAN_NUMERIC, 'categorical': GERMAN_CATEGORICAL, 'exposure': 'credit_amount', 'currency': 'DEM',
+            'source': GERMAN_CITATION, 'source_url': GERMAN_URL, 'synthetic': False,
+            'target_horizon': "Good or bad credit risk as classified by the lender (Southern Germany, 1970s; 1994 Statlog release)",
+            'exposure_assumption': 'Requested credit amount used as an exposure proxy',
+            'split_limit': 'Single historical cohort of 1,000 applicants: no out-of-time validation claim',
+            'protected_fields': ['sex', 'age', 'foreign_worker']}
+    validate_dataset(df, GERMAN_NUMERIC + GERMAN_CATEGORICAL, spec['exposure'])
+    return df.drop(columns=['class', 'personal_status_sex']), spec
+
+
+def download_german_credit():
+    import zipfile
+    content = _download_bounded(GERMAN_URL, max_bytes=2_000_000)
+    with zipfile.ZipFile(BytesIO(content)) as archive:
+        text = archive.read('german.data').decode('latin-1')
+    df, spec = german_credit_dataset(text)
+    spec['source_sha256'] = hashlib.sha256(content).hexdigest()
+    return df, spec

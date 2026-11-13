@@ -42,13 +42,17 @@ function Shell() {
         <div className="topbar">
           <div className="row">
             {meta?.synthetic && <span className="badge pill-warn">Simulated data</span>}
-            {meta && !meta.synthetic && <span className="badge pill-brand">Public UCI data · {meta.currency}</span>}
+            {meta && !meta.synthetic && (
+              <a className="badge pill-brand" href={meta.source_url ?? undefined} target="_blank" rel="noreferrer" style={{ textDecoration: "none" }}>
+                Real data · {meta.name}
+              </a>
+            )}
           </div>
           <Segmented
             label="Dataset"
             value={dataset}
             onChange={setDataset}
-            options={[{ key: "synthetic", label: "Demo data" }, { key: "uci", label: "Real public data" }]}
+            options={[{ key: "uci", label: "Taiwan cards" }, { key: "german", label: "German loans" }, { key: "synthetic", label: "Demo" }]}
           />
         </div>
         <main className="page">

@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from analytics import applicant_explanation, concentration_summary, missingness_summary, segment_loss_summary  # noqa: E402
-from data_sources import download_public_credit, synthetic_dataset  # noqa: E402
+from data_sources import download_german_credit, download_public_credit, synthetic_dataset  # noqa: E402
 from modelling import applicant_sensitivity, model_feature_importance, score_band, train_credit_models  # noqa: E402
 from monitoring import feature_drift_table, score_drift_summary  # noqa: E402
 from research import compare_selections, loss_scenarios, result_bundle  # noqa: E402
@@ -32,10 +32,11 @@ from subgroup import add_audit_groups, add_intersection_group, available_group_c
 
 from api.fields import describe, label  # noqa: E402
 
-Dataset = Literal["synthetic", "uci"]
+Dataset = Literal["synthetic", "uci", "german"]
+LOADERS = {"synthetic": synthetic_dataset, "uci": download_public_credit, "german": download_german_credit}
 BANDS = ["A (<5%)", "B (5–10%)", "C (10–18%)", "D (18–30%)", "E (30%+)"]
 BAND_NAMES = {"A (<5%)": "Very low", "B (5–10%)": "Low", "C (10–18%)": "Moderate", "D (18–30%)": "High", "E (30%+)": "Very high"}
-SEGMENT_FIELDS = ["credit_score_band", "loan_purpose", "employment_status", "home_ownership"]
+SEGMENT_FIELDS = ["credit_score_band", "loan_purpose", "employment_status", "home_ownership", "purpose", "housing", "job", "checking_account"]
 METRIC_INFO = {
     "roc_auc": {"label": "Ranking accuracy (ROC AUC)", "kind": "ratio", "better": "higher",
                 "help": "How well the model ranks defaulters above non-defaulters. 0.5 is a coin flip, 1.0 is perfect."},
@@ -55,7 +56,7 @@ _study_lock = threading.Lock()
 
 @lru_cache(maxsize=2)
 def _study(dataset: str) -> dict:
-    df, spec = synthetic_dataset() if dataset == "synthetic" else download_public_credit()
+    df, spec = LOADERS[dataset]()
     return train_credit_models(df, spec)
 
 
@@ -98,6 +99,9 @@ def meta(dataset: Dataset = "synthetic"):
     return {
         "dataset": dataset,
         "synthetic": bool(spec["synthetic"]),
+        "name": {"synthetic": "Simulated applicants", "uci": "Taiwan credit-card clients (UCI)", "german": "German Credit (UCI Statlog)"}[dataset],
+        "source_url": spec.get("source_url"),
+        "protected_fields": [label(f) for f in spec.get("protected_fields", ["SEX", "EDUCATION", "MARRIAGE", "AGE"] if dataset == "uci" else [])],
         "source": spec["source"],
         "currency": spec["currency"],
         "outcome": spec["target_horizon"],
@@ -178,7 +182,7 @@ def applicants(
     view = df
     if search:
         needle = search.strip().lower()
-        text_columns = [c for c in ["application_id", "loan_purpose", "employment_status", "home_ownership"] if c in df]
+        text_columns = [c for c in ["application_id", "loan_purpose", "employment_status", "home_ownership", "purpose", "job", "housing"] if c in df]
         mask = np.zeros(len(df), dtype=bool)
         for column in text_columns:
             mask |= df[column].astype(str).str.lower().str.contains(needle, regex=False).to_numpy()
@@ -189,7 +193,7 @@ def applicants(
              "exposure": ("ead", False), "id": ("application_id", True)}[sort]
     view = view.sort_values(order[0], ascending=order[1])
     columns = [c for c in ["application_id", "credit_score_band", "probability_default", "ead", "expected_loss",
-                           "loan_purpose", "employment_status", "annual_income", "fico_score", "age", "AGE", "LIMIT_BAL"] if c in view]
+                           "loan_purpose", "purpose", "employment_status", "job", "annual_income", "fico_score", "age", "AGE", "LIMIT_BAL"] if c in view]
     page = view.iloc[offset:offset + limit][columns]
     return {"total": int(len(view)), "rows": records(page)}
 

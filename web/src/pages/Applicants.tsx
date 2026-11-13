@@ -13,6 +13,8 @@ interface ApplicantRow {
   ead: number;
   expected_loss: number;
   loan_purpose?: string;
+  purpose?: string;
+  job?: string;
   employment_status?: string;
   annual_income?: number;
   age?: number;
@@ -52,7 +54,7 @@ export default function Applicants() {
             <input
               className="input"
               style={{ flex: 1 }}
-              placeholder={meta?.synthetic ? "Search by ID, purpose or employment" : "Search by ID"}
+              placeholder={meta?.dataset === "uci" ? "Search by ID" : "Search by ID, purpose or job"}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               aria-label="Search applicants"
@@ -85,7 +87,7 @@ export default function Applicants() {
           ) : (
             data.rows.map((row) => {
               const letter = row.credit_score_band.slice(0, 1);
-              const details = [row.loan_purpose, row.employment_status, row.age ?? row.AGE ? `age ${row.age ?? row.AGE}` : undefined]
+              const details = [row.loan_purpose ?? row.purpose, row.employment_status ?? row.job, row.age ?? row.AGE ? `age ${row.age ?? row.AGE}` : undefined]
                 .filter(Boolean).join(" · ");
               return (
                 <Link key={row.application_id} to={`/applicants/${encodeURIComponent(row.application_id)}`} className="list-row">

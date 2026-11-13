@@ -110,7 +110,11 @@ export default function ApplicantDetail() {
       </Card>
       {!meta.synthetic && (
         <div className="section">
-          <Notice>Amounts are in New Taiwan dollars from the public UCI credit-card dataset (2005). Sex, education and marital status are shown as the dataset's own codes.</Notice>
+          <Notice>
+            {meta.dataset === "german"
+              ? "Real 1970s loan applications from southern Germany (UCI Statlog German Credit, CC BY 4.0). Amounts are in Deutsche Mark. Sex, age and foreign-worker status are not used by the model."
+              : "Real 2005 credit-card clients in Taiwan (UCI, CC BY 4.0). Amounts are in New Taiwan dollars. Sex, education, marital status and age are not used by the model."}
+          </Notice>
         </div>
       )}
     </>
