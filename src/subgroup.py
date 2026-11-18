@@ -23,7 +23,7 @@ def available_group_columns(scored: pd.DataFrame) -> list[str]:
     """Expose intentional evaluation fields, never arbitrary high-cardinality IDs."""
     candidates = [
         "employment_status", "home_ownership", "loan_purpose", "age_band",
-        "SEX", "EDUCATION", "MARRIAGE",
+        "SEX", "EDUCATION", "MARRIAGE", "sex", "foreign_worker", "housing", "job",
     ]
     frame = add_audit_groups(scored)
     return [column for column in candidates if column in frame and frame[column].nunique(dropna=True) > 1]

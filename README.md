@@ -92,6 +92,48 @@ python scripts/run_research.py
 streamlit run app.py
 ```
 
+## Real datasets
+
+Credit Risk Studio opens on real data by default. You can switch between three datasets:
+
+| Dataset | What it is | Licence |
+|---|---|---|
+| **Taiwan credit-card clients** (default) | 30,000 real clients, Taiwan, 2005. Did they default on next month's payment? | [CC BY 4.0](https://doi.org/10.24432/C55S3H). Yeh, I. (2009), UCI Machine Learning Repository |
+| **German loans** | 1,000 real loan applications, southern Germany (1970s), each classed as a good or bad credit risk | [CC BY 4.0](https://doi.org/10.24432/C5NC77). Hofmann, H. (1994), Statlog (German Credit Data), UCI |
+| **Demo** | Simulated applicants for exploring the tools | — |
+
+Both real datasets are downloaded from UCI on demand and are not stored in this repository. The German dataset's
+coded answers (such as `A11`) are translated into plain English using the dataset's own documentation.
+
+**Protected characteristics are never model inputs.** Sex, age and foreign-worker status (German data), and sex,
+education, marital status and age (Taiwan data), are excluded from every model. They are kept only for the
+Fairness check, which shows whether the model is equally well calibrated across those groups.
+
+## Credit Risk Studio web app (preview)
+
+A React web app with a FastAPI backend that reuses the same tested analysis code in `src/`.
+It has five screens: Portfolio, Applicants (with a profile per person), What-if scenarios,
+Model quality and Fairness check. Every field is shown with a plain-English name and format.
+
+Requires Python 3.12+ and Node.js 20+.
+
+```bash
+pip install -r requirements.txt
+cd web && npm install && npm run build && cd ..
+python -m uvicorn api.main:app --port 8000
+```
+
+Open http://localhost:8000. FastAPI serves both the app and its API (`/api/...`).
+
+For development with instant reloads, run the API and the React dev server side by side:
+
+```bash
+python -m uvicorn api.main:app --reload --port 8000
+cd web && npm run dev
+```
+
+Then open http://localhost:5173. The Streamlit dashboard above still works unchanged.
+
 ## Dashboard screenshots
 
 ### Held-out portfolio
